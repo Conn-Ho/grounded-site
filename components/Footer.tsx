@@ -19,10 +19,10 @@ export default function Footer({ dict }: { dict: Dict["footer"] }) {
           </span>
         </div>
         <div className="mono flex flex-wrap gap-6 text-[11px] uppercase tracking-wider text-[color:var(--muted)]">
-          <a href="https://github.com/your-org/grounded" className="hover:text-[color:var(--foreground)]">
+          <a href="https://github.com/Conn-Ho/grounded-site" className="hover:text-[color:var(--foreground)]">
             {dict.github}
           </a>
-          <a href="https://x.com/grounded_dev" className="hover:text-[color:var(--foreground)]">
+          <a href="https://x.com/amagine_ai" className="hover:text-[color:var(--foreground)]">
             {dict.twitter}
           </a>
           <a href="#faq" className="hover:text-[color:var(--foreground)]">

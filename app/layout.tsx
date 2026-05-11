@@ -7,18 +7,18 @@ import "./globals.css";
 
 const meta = {
   en: {
-    title: "Grounded — Vibe Hardware for AI Agents",
+    title: "Amagine — Vibe Hardware for AI Agents",
     description:
       "Close the loop between AI agents and the physical world. Pick a project. Agent designs, sources, and verifies it. You assemble.",
     ogDesc:
       "The missing tooling layer that lets AI agents design, source, build, and verify real hardware.",
   },
   zh: {
-    title: "Grounded — 让 AI 闭环硬件开发",
+    title: "Amagine — 让 AI 闭环硬件开发",
     description:
       "让 AI Agent 打通硬件开发全流程：选一个项目，Agent 自己设计、采购、验证，你只需组装。",
     ogDesc:
-      "Grounded 是让 AI 接上物理世界的工具层：感知、推理、采购、装配，Agent 全都能做。",
+      "Amagine 是让 AI 接上物理世界的工具层：感知、推理、采购、装配，Agent 全都能做。",
   },
 };
 
@@ -33,7 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
       title: m.title,
       description: m.ogDesc,
       type: "website",
-      url: "https://grounded.dev",
+      url: "https://amagine.ai",
       locale: locale === "zh" ? "zh_CN" : "en_US",
     },
     twitter: {
@@ -47,7 +47,7 @@ export async function generateMetadata(): Promise<Metadata> {
         "zh-CN": "/",
       },
     },
-    metadataBase: new URL(process.env.SITE_URL ?? "https://lingine.tech"),
+    metadataBase: new URL(process.env.SITE_URL ?? "https://amagine.ai"),
   };
 }
 

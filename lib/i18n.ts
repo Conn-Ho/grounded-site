@@ -128,7 +128,7 @@ const en: Dict = {
     accent: "agents",
     line3: "and the physical world.",
     description: (em) =>
-      `Grounded gives AI agents the perception, reasoning, and action capabilities to ${em(
+      `Amagine gives AI agents the perception, reasoning, and action capabilities to ${em(
         "design"
       )}, ${em("source")}, ${em("build")}, and ${em(
         "verify"
@@ -148,7 +148,7 @@ const en: Dict = {
   problem: {
     eyebrow: "The Gap",
     title: "Agents can reason about hardware. They just can't see it.",
-    desc: "Every stage of hardware development produces a feedback signal. The problem is that none of those signals are wired to the agent. Grounded wires them.",
+    desc: "Every stage of hardware development produces a feedback signal. The problem is that none of those signals are wired to the agent. Amagine wires them.",
     today: {
       label: "Today",
       chip: "Open loop",
@@ -162,7 +162,7 @@ const en: Dict = {
       ],
     },
     closed: {
-      label: "With Grounded",
+      label: "With Amagine",
       chip: "Closed loop",
       lines: [
         "Human: 'Design a robot enclosure'",
@@ -183,19 +183,19 @@ const en: Dict = {
         n: "01",
         title: "Design Loop",
         body: "Your KiCad PCB becomes typed constraints. Natural language + PCB → OpenSCAD / Build123d code → rendered PNG → vision check → iterate until spec met. Firmware compiled in Wokwi, serial logs fed back to agent.",
-        tags: ["grounded-cad", "grounded-pcb", "grounded-firmware"],
+        tags: ["amagine-cad", "amagine-pcb", "amagine-firmware"],
       },
       {
         n: "02",
         title: "Sourcing Loop",
         body: "BOM from design → search Waveshare / LCSC / JD / 1688 → price compare → order via API + virtual card. Human sets policy once; agent operates within it.",
-        tags: ["grounded-parts"],
+        tags: ["amagine-parts"],
       },
       {
         n: "03",
         title: "Physical Loop",
         body: "3D print → camera verifies fit → flash firmware → camera + serial test → Three.js assembly guide that you follow step by step.",
-        tags: ["grounded-vision", "assembly-viewer"],
+        tags: ["amagine-vision", "assembly-viewer"],
       },
     ],
   },
@@ -263,22 +263,22 @@ const en: Dict = {
     desc: "Install what you need. Ignore what you don't. Every package speaks Claude Code / MCP / CLI — no custom runtime.",
     items: [
       {
-        name: "grounded-cad",
+        name: "amagine-cad",
         type: "Claude Code Skill",
         desc: "LLM → OpenSCAD / Build123d code → render → vision check → printability verify.",
       },
       {
-        name: "grounded-pcb",
+        name: "amagine-pcb",
         type: "CLI",
         desc: "KiCad → typed constraints + STEP. Makes enclosures actually fit the board.",
       },
       {
-        name: "grounded-parts",
+        name: "amagine-parts",
         type: "CLI",
         desc: "Search, compare, and purchase across Waveshare / LCSC / JD / 1688.",
       },
       {
-        name: "grounded-vision",
+        name: "amagine-vision",
         type: "MCP Server",
         desc: "USB/IP camera → photograph, measure, verify physical objects.",
       },
@@ -288,7 +288,7 @@ const en: Dict = {
         desc: "Three.js step-by-step assembly guide from STL + BOM.",
       },
       {
-        name: "grounded-firmware",
+        name: "amagine-firmware",
         type: "CLI + MCP",
         desc: "Wokwi sim → arduino-cli compile → flash → serial monitor.",
       },
@@ -299,7 +299,7 @@ const en: Dict = {
     title: "Questions, answered straight.",
     items: [
       {
-        q: "Is Grounded a product or a framework?",
+        q: "Is Amagine a product or a framework?",
         a: "A framework. It's a set of Claude Code Skills, MCP servers, and CLI tools. You install the pieces you need into your own agent setup.",
       },
       {
@@ -308,7 +308,7 @@ const en: Dict = {
       },
       {
         q: "What about PCB fabrication?",
-        a: "Grounded generates the Gerbers; fabrication routes through JLCPCB or PCBWay. Order automation is on the roadmap.",
+        a: "Amagine generates the Gerbers; fabrication routes through JLCPCB or PCBWay. Order automation is on the roadmap.",
       },
       {
         q: "When does it launch?",
@@ -336,7 +336,7 @@ const en: Dict = {
     privacy: "No password. No account. Just your email.",
   },
   footer: {
-    tagline: "Grounded · Close the loop",
+    tagline: "Amagine · Close the loop",
     github: "GitHub",
     twitter: "X / Twitter",
     faq: "FAQ",
@@ -361,7 +361,7 @@ const zh: Dict = {
     accent: "智能体",
     line3: "完成整个闭环。",
     description: (em) =>
-      `Grounded 给 AI Agent 装上感知、推理和执行硬件的能力 —— 让它能${em(
+      `Amagine 给 AI Agent 装上感知、推理和执行硬件的能力 —— 让它能${em(
         "设计"
       )}、${em("采购")}、${em("制造")}并${em(
         "验证"
@@ -381,7 +381,7 @@ const zh: Dict = {
   problem: {
     eyebrow: "现状",
     title: "Agent 能推理硬件。它只是看不见硬件。",
-    desc: "硬件开发的每个环节都会产生反馈信号 —— 问题是这些信号没有一个连到 Agent。Grounded 把它们全接上。",
+    desc: "硬件开发的每个环节都会产生反馈信号 —— 问题是这些信号没有一个连到 Agent。Amagine 把它们全接上。",
     today: {
       label: "现在",
       chip: "开环",
@@ -395,7 +395,7 @@ const zh: Dict = {
       ],
     },
     closed: {
-      label: "接入 Grounded",
+      label: "接入 Amagine",
       chip: "闭环",
       lines: [
         "人类：帮我设计一个机器人外壳",
@@ -416,19 +416,19 @@ const zh: Dict = {
         n: "01",
         title: "设计闭环",
         body: "你的 KiCad PCB 先被解析成结构化约束。自然语言 + PCB → OpenSCAD / Build123d 代码 → 渲染 PNG → 视觉检查 → 迭代至符合规格。固件在 Wokwi 里仿真，串口日志直接回传 Agent。",
-        tags: ["grounded-cad", "grounded-pcb", "grounded-firmware"],
+        tags: ["amagine-cad", "amagine-pcb", "amagine-firmware"],
       },
       {
         n: "02",
         title: "采购闭环",
         body: "从设计中生成 BOM → 搜索微雪 / 立创 / 京东 / 1688 → 跨源比价 → 通过 API + 虚拟卡下单。人类设定一次预算策略，Agent 自主运作。",
-        tags: ["grounded-parts"],
+        tags: ["amagine-parts"],
       },
       {
         n: "03",
         title: "实物闭环",
         body: "3D 打印 → 摄像头核对尺寸 → 烧录固件 → 摄像头 + 串口测试 → Three.js 生成分步组装引导，你照着做就行。",
-        tags: ["grounded-vision", "assembly-viewer"],
+        tags: ["amagine-vision", "assembly-viewer"],
       },
     ],
   },
@@ -496,22 +496,22 @@ const zh: Dict = {
     desc: "按需安装，不用的不装。每个模块都讲 Claude Code / MCP / CLI —— 没有自定义运行时。",
     items: [
       {
-        name: "grounded-cad",
+        name: "amagine-cad",
         type: "Claude Code Skill",
         desc: "LLM → OpenSCAD / Build123d 代码 → 渲染 → 视觉检查 → 可打印性验证。",
       },
       {
-        name: "grounded-pcb",
+        name: "amagine-pcb",
         type: "命令行",
         desc: "KiCad 板 → 结构化约束 + STEP 模型。让外壳和真实 PCB 对得上。",
       },
       {
-        name: "grounded-parts",
+        name: "amagine-parts",
         type: "命令行",
         desc: "跨 微雪 / 立创 / 京东 / 1688 搜索、比价、下单。",
       },
       {
-        name: "grounded-vision",
+        name: "amagine-vision",
         type: "MCP 服务",
         desc: "USB / IP 摄像头 → 拍照、测量、验证实物。",
       },
@@ -521,7 +521,7 @@ const zh: Dict = {
         desc: "基于 STL + BOM 的 Three.js 分步组装引导。",
       },
       {
-        name: "grounded-firmware",
+        name: "amagine-firmware",
         type: "CLI + MCP",
         desc: "Wokwi 仿真 → arduino-cli 编译 → 烧录 → 串口监控。",
       },
@@ -532,7 +532,7 @@ const zh: Dict = {
     title: "直接回答。",
     items: [
       {
-        q: "Grounded 是产品还是框架？",
+        q: "Amagine 是产品还是框架？",
         a: "是框架。它是一组 Claude Code Skill、MCP 服务和 CLI 工具。按需装到你自己的 Agent 环境里。",
       },
       {
@@ -541,7 +541,7 @@ const zh: Dict = {
       },
       {
         q: "PCB 打样怎么办？",
-        a: "Grounded 生成 Gerber 文件，打样走嘉立创或 PCBWay。自动下单功能在 roadmap 上。",
+        a: "Amagine 生成 Gerber 文件，打样走嘉立创或 PCBWay。自动下单功能在 roadmap 上。",
       },
       {
         q: "什么时候发布？",
@@ -569,7 +569,7 @@ const zh: Dict = {
     privacy: "无需密码，无需注册，只需一个邮箱。",
   },
   footer: {
-    tagline: "Grounded · 闭环硬件开发",
+    tagline: "Amagine · 闭环硬件开发",
     github: "GitHub",
     twitter: "X / Twitter",
     faq: "常见问题",

@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const BASE = process.env.SITE_URL ?? "https://grounded.dev";
+const BASE = process.env.SITE_URL ?? "https://amagine.ai";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();

@@ -51,7 +51,7 @@ export default function Nav({
             <circle cx="12" cy="12" r="3" fill="var(--accent)" />
           </svg>
           <span className="display-font text-[15px] tracking-[0.18em]">
-            GROUNDED
+            AMAGINE
           </span>
         </Link>
 
@@ -79,7 +79,7 @@ export default function Nav({
             {dict.joinWaitlist}
           </a>
           <a
-            href="https://x.com/grounded_dev"
+            href="https://x.com/amagine_ai"
             target="_blank"
             rel="noreferrer"
             aria-label="X / Twitter"

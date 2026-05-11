@@ -36,7 +36,7 @@ const huntItems: Record<Locale, HuntItem[]> = {
       source: "GitHub",
       meta: "RP2040 · USB HID · beginner PCB",
       summary:
-        "Small enough to finish, rich enough to exercise sourcing, flashing, and enclosure fit checks inside Grounded.",
+        "Small enough to finish, rich enough to exercise sourcing, flashing, and enclosure fit checks inside Amagine.",
       cta: "Start from this",
       href: "#waitlist",
     },
@@ -60,7 +60,7 @@ const huntItems: Record<Locale, HuntItem[]> = {
       source: "Hacker News",
       meta: "discussion · tooling · workflow",
       summary:
-        "Discussion threads like this are useful signal. They help explain where Grounded should automate and where humans still want control.",
+        "Discussion threads like this are useful signal. They help explain where Amagine should automate and where humans still want control.",
       cta: "Open discussion",
       href: "https://news.ycombinator.com/",
     },
@@ -110,7 +110,7 @@ const huntItems: Record<Locale, HuntItem[]> = {
       source: "GitHub",
       meta: "RP2040 · USB HID · 入门 PCB",
       summary:
-        "体量小、完成快，但足够覆盖采购、烧录和外壳适配这些 Grounded 核心环节。",
+        "体量小、完成快，但足够覆盖采购、烧录和外壳适配这些 Amagine 核心环节。",
       cta: "从这个开始",
       href: "#waitlist",
     },
@@ -122,7 +122,7 @@ const huntItems: Record<Locale, HuntItem[]> = {
       source: "Hackaday",
       meta: "传感器节点 · 电池供电 · 模块化",
       summary:
-        "这类项目很适合 copy-and-remix 工作流：结构清晰，能快速看出 Grounded 在哪里真正省时间。",
+        "这类项目很适合 copy-and-remix 工作流：结构清晰，能快速看出 Amagine 在哪里真正省时间。",
       cta: "跟进这个项目",
       href: "#waitlist",
     },

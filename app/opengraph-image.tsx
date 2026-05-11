@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "Grounded — Vibe Hardware for AI Agents";
+export const alt = "Amagine — Vibe Hardware for AI Agents";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -95,7 +95,7 @@ export default async function OG() {
               display: "flex",
             }}
           />
-          <span>Grounded</span>
+          <span>Amagine</span>
           <div
             style={{
               flex: 1,
@@ -147,7 +147,7 @@ export default async function OG() {
           }}
         >
           <span>Vibe Hardware SDK</span>
-          <span style={{ color: "#e8a53f" }}>grounded.dev</span>
+          <span style={{ color: "#e8a53f" }}>amagine.ai</span>
         </div>
       </div>
     ),
