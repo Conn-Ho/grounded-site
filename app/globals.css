@@ -1,0 +1,170 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0a0908;
+  --background-elevated: #121110;
+  --foreground: #f5f1ea;
+  --foreground-dim: #b8b1a5;
+  --accent: #e8a53f;
+  --accent-hover: #f5b856;
+  --accent-soft: rgba(232, 165, 63, 0.12);
+  --accent-line: rgba(232, 165, 63, 0.35);
+  --card-bg: #0f0d0b;
+  --card-border: #2a241e;
+  --card-border-hover: #3d3528;
+  --muted: #6a6560;
+  --grid: rgba(232, 165, 63, 0.04);
+  --strike: #4a3f33;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-background-elevated: var(--background-elevated);
+  --color-foreground: var(--foreground);
+  --color-foreground-dim: var(--foreground-dim);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-card: var(--card-bg);
+  --color-card-border: var(--card-border);
+  --color-muted: var(--muted);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  /* scroll-behavior enables smooth anchor-link jumps.
+     The one-gesture-per-section logic lives in <SnapScrollController>. */
+  scroll-padding-top: 4rem;
+  scroll-behavior: smooth;
+  overscroll-behavior-y: contain;
+}
+
+html,
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), -apple-system, "SF Pro", "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.snap-section {
+  min-height: 100vh;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .snap-section {
+    min-height: auto;
+  }
+}
+
+body {
+  background-image:
+    radial-gradient(var(--grid) 1px, transparent 1px),
+    radial-gradient(var(--grid) 1px, transparent 1px);
+  background-size: 44px 44px, 44px 44px;
+  background-position: 0 0, 22px 22px;
+  min-height: 100vh;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--background);
+}
+
+.display-font {
+  font-family: var(--font-geist-sans), sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.mono {
+  font-family: var(--font-geist-mono), "JetBrains Mono", monospace;
+}
+
+/* hexagonal button shape via clip-path */
+.hex-btn {
+  clip-path: polygon(
+    12px 0,
+    calc(100% - 12px) 0,
+    100% 50%,
+    calc(100% - 12px) 100%,
+    12px 100%,
+    0 50%
+  );
+}
+
+.hex-chip {
+  clip-path: polygon(
+    6px 0,
+    calc(100% - 6px) 0,
+    100% 50%,
+    calc(100% - 6px) 100%,
+    6px 100%,
+    0 50%
+  );
+}
+
+/* scanline effect for accent blocks */
+.scanlines::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0,
+    transparent 2px,
+    rgba(232, 165, 63, 0.04) 2px,
+    rgba(232, 165, 63, 0.04) 3px
+  );
+  pointer-events: none;
+}
+
+/* subtle strike-through for the USERS→AGENTS motif */
+.strike-diagonal {
+  position: relative;
+  color: var(--muted);
+}
+.strike-diagonal::before,
+.strike-diagonal::after {
+  content: "";
+  position: absolute;
+  left: -4%;
+  right: -4%;
+  height: 2px;
+  background: var(--strike);
+  transform-origin: center;
+}
+.strike-diagonal::before {
+  top: 42%;
+  transform: rotate(-4deg);
+}
+.strike-diagonal::after {
+  top: 56%;
+  transform: rotate(-4deg);
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+.pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee {
+  animation: marquee 40s linear infinite;
+}
