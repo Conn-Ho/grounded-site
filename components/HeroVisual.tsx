@@ -14,8 +14,7 @@ export default function HeroVisual() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    const ctx = canvas.getContext("2d")!;
 
     let w = canvas.clientWidth;
     let h = canvas.clientHeight;
