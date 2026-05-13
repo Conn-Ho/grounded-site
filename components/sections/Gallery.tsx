@@ -1,4 +1,4 @@
-import type { Dict } from "@/lib/i18n";
+﻿import type { Dict } from "@/lib/i18n";
 import SectionHeading from "../SectionHeading";
 
 const covers = [
@@ -10,7 +10,7 @@ const covers = [
 export default function Gallery({ dict }: { dict: Dict["gallery"] }) {
   return (
     <section id="gallery" className="snap-section relative flex flex-col justify-center py-24 md:py-28">
-      <div className="mx-auto max-w-[1400px] px-6 md:px-10">
+      <div className="mx-auto max-w-[1400px] px-6 md:px-10 lg:px-16">
         <div className="flex items-end justify-between gap-8 mb-14">
           <SectionHeading
             eyebrow={dict.eyebrow}

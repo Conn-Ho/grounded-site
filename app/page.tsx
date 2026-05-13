@@ -4,8 +4,7 @@ import SnapScrollController from "@/components/SnapScrollController";
 import Hero from "@/components/Hero";
 import Problem from "@/components/sections/Problem";
 import Loop from "@/components/sections/Loop";
-import Gallery from "@/components/sections/Gallery";
-import HuntPreview from "@/components/sections/HuntPreview";
+import GalleryHunt from "@/components/sections/GalleryHunt";
 import Packages from "@/components/sections/Packages";
 import FAQ from "@/components/sections/FAQ";
 import Waitlist from "@/components/sections/Waitlist";
@@ -27,8 +26,7 @@ export default async function Home() {
         <Hero dict={dict.hero} />
         <Problem dict={dict.problem} />
         <Loop dict={dict.loop} />
-        <Gallery dict={dict.gallery} />
-        <HuntPreview dict={dict.hunt} items={huntItems} />
+        <GalleryHunt galleryDict={dict.gallery} huntDict={dict.hunt} huntItems={huntItems} />
         <Packages dict={dict.packages} />
         <FAQ dict={dict.faq} />
         <Waitlist dict={dict.waitlist} locale={locale} />

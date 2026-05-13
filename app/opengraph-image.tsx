@@ -31,8 +31,8 @@ export default async function OG() {
             left: 32,
             width: 24,
             height: 24,
-            borderTop: "2px solid #e8a53f",
-            borderLeft: "2px solid #e8a53f",
+            borderTop: "2px solid #F65310",
+            borderLeft: "2px solid #F65310",
             display: "flex",
           }}
         />
@@ -43,8 +43,8 @@ export default async function OG() {
             right: 32,
             width: 24,
             height: 24,
-            borderTop: "2px solid #e8a53f",
-            borderRight: "2px solid #e8a53f",
+            borderTop: "2px solid #F65310",
+            borderRight: "2px solid #F65310",
             display: "flex",
           }}
         />
@@ -55,8 +55,8 @@ export default async function OG() {
             left: 32,
             width: 24,
             height: 24,
-            borderBottom: "2px solid #e8a53f",
-            borderLeft: "2px solid #e8a53f",
+            borderBottom: "2px solid #F65310",
+            borderLeft: "2px solid #F65310",
             display: "flex",
           }}
         />
@@ -67,8 +67,8 @@ export default async function OG() {
             right: 32,
             width: 24,
             height: 24,
-            borderBottom: "2px solid #e8a53f",
-            borderRight: "2px solid #e8a53f",
+            borderBottom: "2px solid #F65310",
+            borderRight: "2px solid #F65310",
             display: "flex",
           }}
         />
@@ -79,7 +79,7 @@ export default async function OG() {
             display: "flex",
             alignItems: "center",
             gap: 14,
-            color: "#e8a53f",
+            color: "#F65310",
             fontSize: 22,
             letterSpacing: 6,
             textTransform: "uppercase",
@@ -90,7 +90,7 @@ export default async function OG() {
             style={{
               width: 10,
               height: 10,
-              background: "#e8a53f",
+              background: "#F65310",
               transform: "rotate(45deg)",
               display: "flex",
             }}
@@ -100,7 +100,7 @@ export default async function OG() {
             style={{
               flex: 1,
               height: 1,
-              background: "rgba(232,165,63,0.4)",
+              background: "rgba(246,83,16,0.4)",
               marginLeft: 12,
               display: "flex",
             }}
@@ -126,8 +126,8 @@ export default async function OG() {
             <span style={{ color: "#6a6560", textDecoration: "line-through" }}>
               humans
             </span>
-            <span style={{ color: "#e8a53f", fontSize: 40 }}>→</span>
-            <span style={{ color: "#e8a53f" }}>agents</span>
+            <span style={{ color: "#F65310", fontSize: 40 }}>→</span>
+            <span style={{ color: "#F65310" }}>agents</span>
           </span>
           <span style={{ display: "flex", color: "#b8b1a5", fontSize: 64 }}>
             and the physical world.
@@ -147,7 +147,7 @@ export default async function OG() {
           }}
         >
           <span>Vibe Hardware SDK</span>
-          <span style={{ color: "#e8a53f" }}>amagine.ai</span>
+          <span style={{ color: "#F65310" }}>amagine.ai</span>
         </div>
       </div>
     ),
