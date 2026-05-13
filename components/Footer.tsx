@@ -3,7 +3,7 @@ import type { Dict } from "@/lib/i18n";
 export default function Footer({ dict }: { dict: Dict["footer"] }) {
   return (
     <footer className="border-t border-[color:var(--card-border)]">
-      <div className="mx-auto flex max-w-[1400px] flex-col items-start justify-between gap-6 px-6 py-10 md:flex-row md:items-center md:px-10">
+      <div className="mx-auto flex max-w-[1400px] flex-col items-start justify-between gap-6 px-6 py-10 md:flex-row md:items-center md:px-10 lg:px-16">
         <div className="flex items-center gap-3">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
             <path

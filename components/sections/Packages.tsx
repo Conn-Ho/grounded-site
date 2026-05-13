@@ -1,10 +1,10 @@
-import type { Dict } from "@/lib/i18n";
+﻿import type { Dict } from "@/lib/i18n";
 import SectionHeading from "../SectionHeading";
 
 export default function Packages({ dict }: { dict: Dict["packages"] }) {
   return (
     <section id="packages" className="snap-section relative flex flex-col justify-center py-24 md:py-28">
-      <div className="mx-auto max-w-[1400px] px-6 md:px-10">
+      <div className="mx-auto max-w-[1400px] px-6 md:px-10 lg:px-16">
         <SectionHeading
           eyebrow={dict.eyebrow}
           title={dict.title}

@@ -54,7 +54,7 @@ export default function Waitlist({
 
   return (
     <section id="waitlist" className="snap-section relative flex flex-col justify-center py-24 md:py-28">
-      <div className="mx-auto max-w-[900px] px-6 md:px-10 text-center">
+      <div className="mx-auto max-w-[900px] px-6 md:px-10 lg:px-16 text-center">
         <div className="mono mb-5 inline-flex items-center gap-3 text-[11px] uppercase tracking-[0.25em] text-[color:var(--accent)]">
           <span className="pulse-dot inline-block h-1.5 w-1.5 rounded-full bg-[color:var(--accent)]" />
           {dict.eyebrow}
@@ -64,8 +64,13 @@ export default function Waitlist({
           <br />
           <span className="text-[color:var(--accent)]">{dict.titleLine2}</span>
         </h2>
-        <p className="mx-auto mt-6 max-w-xl text-[16px] leading-relaxed text-[color:var(--foreground-dim)]">
-          {dict.desc}
+        <p className="mx-auto mt-6 max-w-3xl text-[16px] leading-[1.75] text-[color:var(--foreground-dim)]">
+          {dict.desc.split("\n").map((line, i, arr) => (
+            <span key={i}>
+              {line}
+              {i < arr.length - 1 && <br />}
+            </span>
+          ))}
         </p>
 
         {status.kind === "done" ? (
@@ -84,9 +89,9 @@ export default function Waitlist({
         ) : (
           <form
             onSubmit={onSubmit}
-            className="mx-auto mt-10 flex max-w-lg flex-col gap-3"
+            className="mt-10 flex flex-col items-center gap-3"
           >
-            <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="flex w-full max-w-xl flex-col gap-3 sm:flex-row sm:items-center">
               <input
                 type="email"
                 required
@@ -94,14 +99,19 @@ export default function Waitlist({
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={dict.placeholder}
                 disabled={status.kind === "submitting"}
-                className="mono flex-1 border border-[color:var(--card-border)] bg-[color:var(--card-bg)] px-5 py-4 text-[14px] text-[color:var(--foreground)] placeholder:text-[color:var(--muted)] focus:border-[color:var(--accent)] focus:outline-none disabled:opacity-60"
+                className="mono h-12 flex-1 rounded-lg border border-[color:var(--card-border)] bg-[color:var(--card-bg)] px-5 text-[14px] text-[color:var(--foreground)] placeholder:text-[color:var(--muted)] focus:border-[rgba(246,83,16,0.6)] focus:outline-none disabled:opacity-60"
               />
               <button
                 type="submit"
                 disabled={status.kind === "submitting"}
-                className="hex-btn inline-flex h-12 items-center justify-center bg-[color:var(--accent)] px-7 mono text-[13px] uppercase tracking-wider text-[color:var(--background)] transition-transform hover:-translate-y-0.5 disabled:opacity-60 disabled:hover:translate-y-0"
+                className="inline-flex h-12 shrink-0 items-center justify-center gap-2.5 rounded-lg bg-[color:var(--accent)] px-7 mono text-[13px] uppercase tracking-wider text-white font-semibold transition-all hover:-translate-y-0.5 hover:opacity-90 disabled:opacity-60 disabled:hover:translate-y-0 whitespace-nowrap"
               >
                 {status.kind === "submitting" ? dict.submitting : dict.submit}
+                {status.kind !== "submitting" && (
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+                    <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
               </button>
             </div>
             {status.kind === "error" ? (

@@ -5,15 +5,15 @@
   --background-elevated: #121110;
   --foreground: #f5f1ea;
   --foreground-dim: #b8b1a5;
-  --accent: #e8a53f;
-  --accent-hover: #f5b856;
-  --accent-soft: rgba(232, 165, 63, 0.12);
-  --accent-line: rgba(232, 165, 63, 0.35);
+  --accent: #F65310;
+  --accent-hover: #F87540;
+  --accent-soft: rgba(246, 83, 16, 0.12);
+  --accent-line: rgba(246, 83, 16, 0.35);
   --card-bg: #0f0d0b;
   --card-border: #2a241e;
   --card-border-hover: #3d3528;
   --muted: #6a6560;
-  --grid: rgba(232, 165, 63, 0.04);
+  --grid: rgba(246, 83, 16, 0.04);
   --strike: #4a3f33;
 }
 
@@ -83,12 +83,12 @@ body {
   font-family: var(--font-geist-sans), sans-serif;
   font-weight: 800;
   letter-spacing: -0.02em;
-  line-height: 0.95;
+  line-height: 1.15;
   text-transform: uppercase;
 }
 
 .mono {
-  font-family: var(--font-geist-mono), "JetBrains Mono", monospace;
+  font-family: var(--font-geist-sans), -apple-system, "SF Pro", "Segoe UI", sans-serif;
 }
 
 /* hexagonal button shape via clip-path */
@@ -123,8 +123,8 @@ body {
     0deg,
     transparent 0,
     transparent 2px,
-    rgba(232, 165, 63, 0.04) 2px,
-    rgba(232, 165, 63, 0.04) 3px
+    rgba(246, 83, 16, 0.04) 2px,
+    rgba(246, 83, 16, 0.04) 3px
   );
   pointer-events: none;
 }

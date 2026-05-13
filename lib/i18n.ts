@@ -36,8 +36,8 @@ export type Dict = {
     eyebrow: string;
     title: string;
     desc: string;
-    today: { label: string; chip: string; lines: string[] };
-    closed: { label: string; chip: string; lines: string[] };
+    today: { label: string; lines: string[] };
+    closed: { label: string; lines: string[] };
   };
   loop: {
     eyebrow: string;
@@ -122,17 +122,13 @@ const en: Dict = {
   },
   hero: {
     eyebrow: "Vibe Hardware · Early Access",
-    line1: "Close the loop",
-    between: "between",
-    strike: "humans",
-    accent: "agents",
-    line3: "and the physical world.",
-    description: (em) =>
-      `Amagine gives AI agents the perception, reasoning, and action capabilities to ${em(
-        "design"
-      )}, ${em("source")}, ${em("build")}, and ${em(
-        "verify"
-      )} real hardware. Pick a project. Agent runs the loop. You assemble.`,
+    line1: "Vibe coding, then",
+    between: "",
+    strike: "",
+    accent: "vibe hardware.",
+    line3: "",
+    description: (_em) =>
+      `Amagine is a developer framework that connects agents to the physical world. LLMs can already write code — Amagine lets them build hardware.`,
     joinWaitlist: "Join Waitlist",
     browseProjects: "Browse Projects",
     scroll: "Scroll",
@@ -150,27 +146,29 @@ const en: Dict = {
     title: "Agents can reason about hardware. They just can't see it.",
     desc: "Every stage of hardware development produces a feedback signal. The problem is that none of those signals are wired to the agent. Amagine wires them.",
     today: {
-      label: "Today",
-      chip: "Open loop",
+      label: "Today (General Agent + Manual)",
       lines: [
-        "Human: 'Design a robot enclosure'",
+        "Human: Design a robot enclosure",
         "Agent: generates STL code",
-        "Human: opens FreeCAD, check fits…",
-        "Human: searches LCSC, compares prices",
+        "Human: open FreeCAD, check if it fits",
+        "Human: manually compare component prices",
+        "Human: confirm all parts still in stock next month",
         "Human: debug firmware by hand",
-        "⟲ 5-10 iterations, 2+ hours",
+        "Human: enclosure conflicts with PCB, re-order prototype",
+        "⟲ Long iteration cycles, many back-and-forths",
       ],
     },
     closed: {
       label: "With Amagine",
-      chip: "Closed loop",
       lines: [
-        "Human: 'Design a robot enclosure'",
+        "Human: Design a robot enclosure",
         "Agent: generates Build123d code",
-        "  → renders, verifies PCB fit",
-        "  → finds cheapest BOM across suppliers",
-        "  → simulates firmware, checks display",
-        "✓ 3 automated iterations, agent time",
+        "Agent: auto-renders, visual verification, iterates until correct",
+        "Agent: searches JLCPCB / Waveshare / JD / 1688 for cheapest buyable BOM",
+        "Agent: pulls live stock & lead times, swaps discontinued parts",
+        "Agent: simulates firmware, serial logs fed back directly",
+        "Agent: aligns enclosure to PCB geometry at CAD stage, catches conflicts before assembly",
+        "✓ 3 automated iterations, agent completes independently",
       ],
     },
   },
@@ -259,8 +257,8 @@ const en: Dict = {
   },
   packages: {
     eyebrow: "The SDK",
-    title: "Six composable packages. One agent loop.",
-    desc: "Install what you need. Ignore what you don't. Every package speaks Claude Code / MCP / CLI — no custom runtime.",
+    title: "From a requirement to a real device.",
+    desc: "Amagine is an Agent that can run the full hardware design loop end-to-end. Give it a project idea — it handles the rest, and lets you see exactly what it's doing at every step.",
     items: [
       {
         name: "amagine-cad",
@@ -322,18 +320,18 @@ const en: Dict = {
   },
   waitlist: {
     eyebrow: "Invite-only Beta",
-    titleLine1: "Build your first device",
-    titleLine2: "with an agent by your side.",
-    desc: "We're inviting early builders in waves. Drop your email and tell us what you want to make — we'll reach out when your slot opens.",
+    titleLine1: "Your next project —",
+    titleLine2: "build it with an Agent.",
+    desc: "Amagine is opening a small beta for makers and hardware hackers. If you have a project in mind right now — an ESP32 toy, an RP2040 keyboard, a device you want to give someone — tell us. We'll run the loop together.",
     placeholder: "you@domain.com",
-    submit: "Join Waitlist",
+    submit: "Apply for Beta Access",
     submitting: "Submitting…",
     submittedA: "✓ You're on the list",
     submittedB: "We'll be in touch",
     position: "You're #{n} in line",
     errorInvalidEmail: "Please enter a valid email.",
     errorGeneric: "Something went wrong. Try again in a moment.",
-    privacy: "No password. No account. Just your email.",
+    privacy: "1-minute form. No marketing emails — invite only.",
   },
   footer: {
     tagline: "Amagine · Close the loop",
@@ -355,17 +353,13 @@ const zh: Dict = {
   },
   hero: {
     eyebrow: "Vibe Hardware · 抢先体验",
-    line1: "硬件开发的未来",
-    between: "从",
-    strike: "人力",
-    accent: "智能体",
-    line3: "完成整个闭环。",
-    description: (em) =>
-      `Amagine 给 AI Agent 装上感知、推理和执行硬件的能力 —— 让它能${em(
-        "设计"
-      )}、${em("采购")}、${em("制造")}并${em(
-        "验证"
-      )}真实设备。你只需挑一个项目，Agent 跑完整个闭环，你负责最后的组装。`,
+    line1: "Vibe coding 之后，",
+    between: "",
+    strike: "",
+    accent: "vibe hardware.",
+    line3: "",
+    description: (_em) =>
+      `Amagine 是给 Agent 接物理世界的开发者框架。\nLLM 现在能写代码，Amagine 让它能造出硬件。`,
     joinWaitlist: "加入内测",
     browseProjects: "浏览项目",
     scroll: "下滑",
@@ -380,29 +374,31 @@ const zh: Dict = {
   },
   problem: {
     eyebrow: "现状",
-    title: "Agent 能推理硬件。它只是看不见硬件。",
+    title: "Agent 能推理硬件，\n它只是看不见硬件。",
     desc: "硬件开发的每个环节都会产生反馈信号 —— 问题是这些信号没有一个连到 Agent。Amagine 把它们全接上。",
     today: {
-      label: "现在",
-      chip: "开环",
+      label: "现在（用通用 Agent + 手动）",
       lines: [
         "人类：帮我设计一个机器人外壳",
-        "Agent：生成一段 STL 代码",
-        "人类：打开 FreeCAD 检查是否合适…",
-        "人类：上立创对比元件价格",
+        "Agent：生成 STL 代码",
+        "人类：打开 FreeCAD 检查是否合适",
+        "人类：自行对比元件价格",
+        "人类：确认所有元件下个月还买得到",
         "人类：手动调试固件",
-        "⟲ 5-10 次迭代，2 小时起",
+        "人类：外壳与 PCB 冲突，重新打样",
+        "⟲ 长期迭代，多次打回",
       ],
     },
     closed: {
       label: "接入 Amagine",
-      chip: "闭环",
       lines: [
         "人类：帮我设计一个机器人外壳",
         "Agent：生成 Build123d 代码",
-        "  → 渲染，自动验证 PCB 适配",
-        "  → 跨平台搜索最便宜的 BOM",
-        "  → 仿真固件，检查显示输出",
+        "Agent：自动渲染并视觉验证，迭代到对",
+        "Agent：跨嘉立创 / 微雪 / 京东 / 1688 搜索最便宜的可买 BOM",
+        "Agent：实时拉库存和交期，停产的直接换替代",
+        "Agent：仿真固件，串口日志直接回传",
+        "Agent：CAD 阶段就跟 PCB 几何对齐，装配前发现冲突",
         "✓ 3 次自动迭代，Agent 独立完成",
       ],
     },
@@ -492,8 +488,8 @@ const zh: Dict = {
   },
   packages: {
     eyebrow: "SDK",
-    title: "六个可组合的模块，一个 Agent 闭环。",
-    desc: "按需安装，不用的不装。每个模块都讲 Claude Code / MCP / CLI —— 没有自定义运行时。",
+    title: "从一个需求到一台真实的设备",
+    desc: "Amagine 是一个能完整跑通硬件设计的 Agent。你只需要给它一个项目想法，剩下的它替你跑——并且让你随时看见它在做什么。",
     items: [
       {
         name: "amagine-cad",
@@ -555,18 +551,18 @@ const zh: Dict = {
   },
   waitlist: {
     eyebrow: "邀请制内测",
-    titleLine1: "造出你的第一台设备",
-    titleLine2: "身边有个 AI 搭档。",
-    desc: "我们正分批邀请早期用户。留下邮箱，告诉我们你想做什么 —— 轮到你时我们会联系。",
+    titleLine1: "你做的下一个项目，",
+    titleLine2: "可以让 Agent 一起做。",
+    desc: "Amagine 现在正在小范围邀请创客和硬件极客内测。\n如果你最近正好有想做的项目——一个 ESP32 玩具、一个 RP2040 键盘、一个想送给家人的小设备\n——告诉我们，我们一起跑一遍。",
     placeholder: "your@domain.com",
-    submit: "加入内测",
+    submit: "填写内测申请",
     submitting: "提交中…",
     submittedA: "✓ 已加入名单",
     submittedB: "我们会尽快联系你",
     position: "你是第 {n} 位",
     errorInvalidEmail: "请输入有效的邮箱地址。",
     errorGeneric: "出了点问题，稍后再试一次。",
-    privacy: "无需密码，无需注册，只需一个邮箱。",
+    privacy: "1 分钟问卷。不发营销邮件，只发邀请。",
   },
   footer: {
     tagline: "Amagine · 闭环硬件开发",

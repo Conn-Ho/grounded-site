@@ -89,7 +89,7 @@ export default function ParticleField({
         if (d.y > h + 10) d.y = -10;
 
         if (d.accent) {
-          ctx.fillStyle = `rgba(232, 165, 63, ${d.a})`;
+          ctx.fillStyle = `rgba(246, 83, 16, ${d.a})`;
         } else {
           ctx.fillStyle = `rgba(245, 241, 234, ${d.a * 0.45})`;
         }

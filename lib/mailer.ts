@@ -58,7 +58,7 @@ function renderHtml(locale: Locale) {
         <td align="center">
           <table width="560" cellpadding="0" cellspacing="0" style="background:#0f0d0b;border:1px solid #2a241e;">
             <tr><td style="padding:36px 40px 24px;border-bottom:1px solid #2a241e;">
-              <div style="color:#e8a53f;letter-spacing:.2em;font-size:12px;text-transform:uppercase;font-weight:600;">
+              <div style="color:#F65310;letter-spacing:.2em;font-size:12px;text-transform:uppercase;font-weight:600;">
                 ◇ Amagine · Early Access
               </div>
             </td></tr>
