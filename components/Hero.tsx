@@ -16,7 +16,7 @@ export default function Hero({ dict }: { dict: Dict["hero"] }) {
     <section className="snap-section relative flex items-center overflow-hidden pt-20 pb-16">
       <ParticleField />
 
-      <div className="relative z-10 mx-auto grid w-full max-w-[1400px] grid-cols-1 items-center gap-10 px-6 md:px-10 lg:px-16 lg:grid-cols-[1.4fr_0.6fr]">
+      <div className="relative z-10 mx-auto grid w-full max-w-[1400px] grid-cols-1 items-stretch gap-10 px-6 md:px-10 lg:px-16 lg:grid-cols-[1.2fr_0.8fr]">
         <div>
 
           {/* Eyebrow — 小标签，与标题拉开层次 */}
@@ -30,13 +30,13 @@ export default function Hero({ dict }: { dict: Dict["hero"] }) {
             className="normal-case font-[800]"
             style={{
               fontFamily: "var(--font-geist-sans), sans-serif",
-              fontSize: "clamp(2.8rem, 5vw, 5.2rem)",
+              fontSize: "clamp(2.2rem, 3.6vw, 4.4rem)",
               lineHeight: 1.28,
               letterSpacing: "0em",
             }}
           >
-            <span className="block text-[color:var(--foreground)]">{dict.line1}</span>
-            <span className="block text-[color:var(--accent)]">{dict.accent}</span>
+            <span className="block whitespace-nowrap text-[color:var(--foreground)]">{dict.line1}</span>
+            <span className="block whitespace-nowrap text-[color:var(--accent)]">{dict.accent}</span>
           </h1>
 
           {/* 描述段落 — 16px min（UX rule #67），行距1.7（rule #72），65字符宽度（rule #73） */}
@@ -96,35 +96,12 @@ export default function Hero({ dict }: { dict: Dict["hero"] }) {
             </a>
           </div>
 
-          {/* 数据统计 — 卡片式，静态样式无交互状态 */}
-          <div className="mt-8 grid grid-cols-3 gap-3" style={{ maxWidth: "420px" }}>
-            {[
-              { value: dict.stats.packagesValue, label: dict.stats.packagesLabel },
-              { value: dict.stats.buildsValue,   label: dict.stats.buildsLabel },
-              { value: dict.stats.savedValue,    label: dict.stats.savedLabel },
-            ].map((s, i) => (
-              <div
-                key={i}
-                className="flex flex-col gap-2 px-4 py-4" style={{ background: "#1e1a16" }}
-              >
-                <span
-                  className="font-bold text-[color:var(--accent)] leading-none"
-                  style={{ fontSize: "clamp(1.5rem, 2.4vw, 1.9rem)" }}
-                >
-                  {s.value}
-                </span>
-                <span className="text-[11px] leading-snug text-[color:var(--muted)]">
-                  {s.label}
-                </span>
-              </div>
-            ))}
-          </div>
 
         </div>
 
-        <div className="relative flex items-center justify-center">
+        <div className="relative flex items-center justify-center self-stretch min-h-[420px]">
           <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,var(--accent-soft)_0%,transparent_60%)]" />
-          <div className="relative aspect-square w-full max-w-[520px]">
+          <div className="relative w-full h-full">
             <HeroVisual />
           </div>
         </div>
