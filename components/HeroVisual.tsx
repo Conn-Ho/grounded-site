@@ -1,386 +1,842 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef, useMemo, useState, useEffect, useCallback } from "react";
+import { Canvas, useFrame, ThreeEvent } from "@react-three/fiber";
+import { Html, OrbitControls } from "@react-three/drei";
+import * as THREE from "three";
 
-/**
- * Isometric hardware-agent stack.
- * Two platform layers (MCP → Agents), container boxes on top,
- * region nodes connected by animated dashed lines.
- * Pulsing orange beacons + flares keep the energy of the original sphere.
- */
-export default function HeroVisual() {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+/* ───────────────────────────────────────────────
+   Theme
+   ─────────────────────────────────────────────── */
+interface ThemeColors {
+  bg: string;
+  platformTop: string;
+  platformSide: string;
+  platformEdge: string;
+  platformLabel: string;
+  boxTop: string;
+  boxSide: string;
+  boxEdge: string;
+  boxActiveTop: string;
+  boxActiveSide: string;
+  boxActiveEdge: string;
+  coreTop: string;
+  coreSide: string;
+  coreEdge: string;
+  nodeBg: string;
+  nodeEdge: string;
+  nodeLabel: string;
+  accent: string;
+  connection: string;
+  text: string;
+  dim: string;
+}
 
+const DARK: ThemeColors = {
+  bg: "#0a0908",
+  platformTop: "rgba(30,26,22,0.92)",
+  platformSide: "rgba(22,20,16,0.88)",
+  platformEdge: "rgba(61,53,40,0.7)",
+  platformLabel: "#9a958f",
+  boxTop: "#3a322a",
+  boxSide: "#2a241e",
+  boxEdge: "rgba(90,70,50,0.7)",
+  boxActiveTop: "#4a3020",
+  boxActiveSide: "#362416",
+  boxActiveEdge: "#F65310",
+  coreTop: "#0a0a0a",
+  coreSide: "#050505",
+  coreEdge: "#F65310",
+  nodeBg: "#2a241e",
+  nodeEdge: "rgba(246,83,16,0.35)",
+  nodeLabel: "#d5cfc5",
+  accent: "#F65310",
+  connection: "#F65310",
+  text: "#f5f1ea",
+  dim: "#b8b1a5",
+};
+
+const LIGHT: ThemeColors = {
+  bg: "#f5f5f5",
+  platformTop: "#f0eeeb",
+  platformSide: "#e8e6e3",
+  platformEdge: "#d0cec8",
+  platformLabel: "#9a9895",
+  boxTop: "#ffffff",
+  boxSide: "#f5f5f5",
+  boxEdge: "#d0d0d0",
+  boxActiveTop: "#fff8f5",
+  boxActiveSide: "#ffece5",
+  boxActiveEdge: "#F65310",
+  coreTop: "#1a1a1a",
+  coreSide: "#0f0f0f",
+  coreEdge: "#F65310",
+  nodeBg: "#ffffff",
+  nodeEdge: "#d0d0d0",
+  nodeLabel: "#4a4a4a",
+  accent: "#F65310",
+  connection: "#F65310",
+  text: "#1a1a1a",
+  dim: "#4a4a4a",
+};
+
+function useTheme() {
+  const [isDark, setIsDark] = useState(true);
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d")!;
-
-    let w = canvas.clientWidth;
-    let h = canvas.clientHeight;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    let rafId = 0;
-    let last = performance.now();
-    let flareTimer = 0;
-    let flareIdx = -1;
-
-    const resize = () => {
-      w = canvas.clientWidth;
-      h = canvas.clientHeight;
-      canvas.width = Math.floor(w * dpr);
-      canvas.height = Math.floor(h * dpr);
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const check = () => {
+      const hasDark = document.documentElement.classList.contains("dark");
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      if (document.documentElement.hasAttribute("data-theme")) {
+        setIsDark(document.documentElement.getAttribute("data-theme") === "dark");
+      } else {
+        setIsDark(hasDark || (!document.documentElement.classList.contains("light") && prefersDark));
+      }
     };
+    check();
+    const obs = new MutationObserver(check);
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ["class", "data-theme"] });
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    mq.addEventListener("change", check);
+    return () => { obs.disconnect(); mq.removeEventListener("change", check); };
+  }, []);
+  return isDark ? DARK : LIGHT;
+}
 
-    // Standard 2:1 isometric projection
-    function iso(gx: number, gy: number, gz: number, scale: number, cx: number, cy: number) {
-      return {
-        sx: cx + (gx - gy) * scale,
-        sy: cy + (gx + gy) * scale * 0.5 - gz * scale,
-      };
+/* ───────────────────────────────────────────────
+   Utils
+   ─────────────────────────────────────────────── */
+const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
+/* ───────────────────────────────────────────────
+   Particle Intro — converge to center, then explode
+   ─────────────────────────────────────────────── */
+const PARTICLE_COUNT = 500;
+
+function centerTargets(count: number) {
+  const pts = new Float32Array(count * 3);
+  for (let i = 0; i < count; i++) {
+    pts[i * 3] = 0;
+    pts[i * 3 + 1] = 0;
+    pts[i * 3 + 2] = 0;
+  }
+  return pts;
+}
+
+const PARTICLE_VERT = /* glsl */ `
+  attribute vec3 targetPosition;
+  attribute float particleSpeed;
+  uniform float u_progress;
+  uniform float u_time;
+  uniform float u_size;
+  varying float v_alpha;
+  void main() {
+    // 粒子向中心汇聚（ease-out cubic）
+    float p = clamp(u_progress * (1.0 + particleSpeed * 0.5), 0.0, 1.0);
+    float t = 1.0 - pow(1.0 - p, 3.0);
+    vec3 pos = mix(position, targetPosition, t);
+    vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+    gl_PointSize = u_size * (100.0 / -mvPosition.z);
+    gl_Position = projectionMatrix * mvPosition;
+    v_alpha = 0.6 + 0.3 * p;
+  }
+`;
+
+const PARTICLE_FRAG = /* glsl */ `
+  uniform vec3 u_color;
+  varying float v_alpha;
+  void main() {
+    float d = length(gl_PointCoord - vec2(0.5));
+    if (d > 0.5) discard;
+    float alpha = v_alpha * smoothstep(0.5, 0.2, d);
+    gl_FragColor = vec4(u_color, alpha);
+  }
+`;
+
+function ParticleIntro() {
+  const pointsRef = useRef<THREE.Points>(null);
+  const shaderRef = useRef<THREE.ShaderMaterial>(null);
+
+  const geometry = useMemo(() => {
+    const start = randomSpherePoints(PARTICLE_COUNT, 5);
+    const target = centerTargets(PARTICLE_COUNT);
+    const spd = Float32Array.from({ length: PARTICLE_COUNT }, () => 0.5 + Math.random() * 0.5);
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.BufferAttribute(start, 3));
+    geo.setAttribute("targetPosition", new THREE.BufferAttribute(target, 3));
+    geo.setAttribute("particleSpeed", new THREE.BufferAttribute(spd, 1));
+    return geo;
+  }, []);
+
+  useFrame((state) => {
+    const mat = shaderRef.current;
+    if (!mat) return;
+    const t = state.clock.elapsedTime;
+    mat.uniforms.u_time.value = t;
+
+    // 0.3s 延迟 + 1.5s 凝聚（更慢更明显）
+    const delay = 0.3;
+    const duration = 1.5;
+    const raw = (t - delay) / duration;
+    const progress = Math.max(0, Math.min(1, raw));
+    mat.uniforms.u_progress.value = progress;
+
+    // 粒子在 94% 进度后缩小消失
+    if (progress > 0.94) {
+      const fade = 1 - (progress - 0.94) / 0.06;
+      mat.uniforms.u_size.value = 1.2 * Math.max(0, fade);
+      if (pointsRef.current) pointsRef.current.visible = fade > 0.01;
+    } else {
+      mat.uniforms.u_size.value = 1.2;
+      if (pointsRef.current) pointsRef.current.visible = true;
     }
+  });
 
-    // ── Beacon positions (pulsing orange dots) ──
-    const beacons = [
-      { gx: -1.6, gy: 0,    gz: 1.02, phase: 0.0 },
-      { gx:  0,   gy: -1.6, gz: 1.02, phase: 1.3 },
-      { gx:  1.6, gy: 0,    gz: 1.02, phase: 2.5 },
-      { gx:  0,   gy:  1.6, gz: 1.02, phase: 0.7 },
-      { gx: -0.7, gy: -0.3, gz: 1.62, phase: 1.8 },
-      { gx:  0.6, gy:  0.4, gz: 1.62, phase: 0.4 },
+  return (
+    <points ref={pointsRef} geometry={geometry} frustumCulled={false}>
+      <shaderMaterial
+        ref={shaderRef}
+        attach="material"
+        vertexShader={PARTICLE_VERT}
+        fragmentShader={PARTICLE_FRAG}
+        transparent
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+        uniforms={{
+          u_progress: { value: 0 },
+          u_time: { value: 0 },
+          u_size: { value: 1.2 },
+          u_color: { value: new THREE.Color("#F65310") },
+        }}
+      />
+    </points>
+  );
+}
+
+/* ───────────────────────────────────────────────
+   Center Glow — 粒子汇聚后的中心光点
+   ─────────────────────────────────────────────── */
+function CenterGlow({ accentColor }: { accentColor: string }) {
+  const glowRef = useRef<THREE.Mesh>(null);
+
+  useFrame((state) => {
+    const g = glowRef.current;
+    if (!g) return;
+    const t = state.clock.elapsedTime;
+    const pulse = Math.sin(t * 3) * 0.5 + 0.5;
+    const s = 0.6 + pulse * 0.5;
+    g.scale.setScalar(s);
+    (g.material as THREE.MeshBasicMaterial).opacity = 0.5 + pulse * 0.4;
+  });
+
+  return (
+    <mesh ref={glowRef} position={[0, 0, 0]} frustumCulled={false}>
+      <planeGeometry args={[0.8, 0.8]} />
+      <meshBasicMaterial
+        color={accentColor}
+        transparent
+        opacity={0.7}
+        depthWrite={false}
+        side={THREE.DoubleSide}
+      />
+    </mesh>
+  );
+}
+
+function randomSpherePoints(count: number, radius: number) {
+  const pts = new Float32Array(count * 3);
+  for (let i = 0; i < count; i++) {
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+    const r = radius * Math.cbrt(Math.random());
+    pts[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+    pts[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+    pts[i * 3 + 2] = r * Math.cos(phi);
+  }
+  return pts;
+}
+
+/* ───────────────────────────────────────────────
+   Platform
+   ─────────────────────────────────────────────── */
+function Platform({
+  width = 3,
+  depth = 3,
+  height = 0.12,
+  position = [0, 0, 0] as [number, number, number],
+  label = "",
+  theme,
+}: {
+  width?: number;
+  depth?: number;
+  height?: number;
+  position?: [number, number, number];
+  label?: string;
+  theme: ThemeColors;
+}) {
+  const materials = useMemo(() => {
+    const top = new THREE.MeshStandardMaterial({
+      color: theme.platformTop,
+      transparent: true,
+      opacity: 0.95,
+      roughness: 0.6,
+      metalness: 0.15,
+    });
+    const side = new THREE.MeshStandardMaterial({
+      color: theme.platformSide,
+      transparent: true,
+      opacity: 0.9,
+      roughness: 0.7,
+      metalness: 0.08,
+    });
+    const edge = new THREE.MeshStandardMaterial({
+      color: theme.platformEdge,
+      transparent: true,
+      opacity: 0.8,
+      roughness: 0.5,
+      metalness: 0.1,
+    });
+    return [side, side, top, edge, side, side];
+  }, [theme]);
+
+  return (
+    <group position={position}>
+      <mesh castShadow receiveShadow material={materials}>
+        <boxGeometry args={[width, height, depth]} />
+      </mesh>
+      {label && (
+        <Html
+          position={[width * 0.35, -height / 2 - 0.02, depth * 0.35]}
+          center
+          style={{ pointerEvents: "none" }}
+        >
+          <span
+            style={{
+              color: theme.platformLabel,
+              fontSize: "9px",
+              fontFamily: "monospace",
+              letterSpacing: "0.15em",
+              textTransform: "uppercase",
+              whiteSpace: "nowrap",
+              opacity: 0.65,
+            }}
+          >
+            {label}
+          </span>
+        </Html>
+      )}
+    </group>
+  );
+}
+
+/* ───────────────────────────────────────────────
+   Box / Container
+   ─────────────────────────────────────────────── */
+interface BoxData {
+  id: number;
+  gx: number;
+  gz: number;
+  isCore?: boolean;
+  label?: string;
+  labelSub?: string;
+}
+
+function AnimatedBox({
+  data,
+  baseY,
+  theme,
+  hoveredId,
+  setHoveredId,
+  onClick,
+}: {
+  data: BoxData;
+  baseY: number;
+  theme: ThemeColors;
+  hoveredId: number;
+  setHoveredId: (id: number) => void;
+  onClick?: (id: number) => void;
+}) {
+  const groupRef = useRef<THREE.Group>(null);
+  const glowRef = useRef<THREE.Mesh>(null);
+  const [currentLift, setCurrentLift] = useState(0);
+  const liftRef = useRef(0);
+  const scaleRef = useRef(1);
+
+  const isHovered = hoveredId === data.id;
+  const isCore = data.isCore;
+
+  const materials = useMemo(() => {
+    const pick = (top: string, side: string, edge: string) => [
+      new THREE.MeshStandardMaterial({ color: side, roughness: 0.7, metalness: 0.05 }),
+      new THREE.MeshStandardMaterial({ color: side, roughness: 0.7, metalness: 0.05 }),
+      new THREE.MeshStandardMaterial({ color: top, roughness: 0.6, metalness: 0.1 }),
+      new THREE.MeshStandardMaterial({ color: side, roughness: 0.8, metalness: 0.02 }),
+      new THREE.MeshStandardMaterial({ color: side, roughness: 0.7, metalness: 0.05 }),
+      new THREE.MeshStandardMaterial({ color: side, roughness: 0.7, metalness: 0.05 }),
     ];
+    if (isCore) return pick(theme.coreTop, theme.coreSide, theme.coreEdge);
+    if (isHovered) return pick(theme.boxActiveTop, theme.boxActiveSide, theme.boxActiveEdge);
+    return pick(theme.boxTop, theme.boxSide, theme.boxEdge);
+  }, [theme, isHovered, isCore]);
 
-    const flareSpots = [
-      { gx: -1.6, gy: 0,    gz: 1.02 },
-      { gx:  1.6, gy: 0,    gz: 1.02 },
-      { gx:  0,   gy: -1.6, gz: 1.02 },
-      { gx:  0,   gy:  1.6, gz: 1.02 },
-    ];
+  useFrame((state) => {
+    const t = state.clock.elapsedTime;
+    const group = groupRef.current;
+    const glow = glowRef.current;
+    if (!group) return;
 
-    // ── Draw a flat rhombus platform (top + two side faces) ──
-    function drawPlatform(
-      t: number, scale: number, cx: number, cy: number,
-      hw: number, hh: number,      // half grid-size
-      gz: number, depth: number,    // top z, slab thickness
-      opts: {
-        topFill: string; sideFill: string;
-        stroke: string; labelColor: string; label: string;
-      }
-    ) {
-      const { topFill, sideFill, stroke, labelColor, label } = opts;
-      const N = iso(0,    -hh,  gz,         scale, cx, cy);
-      const E = iso(hw,    0,   gz,         scale, cx, cy);
-      const S = iso(0,     hh,  gz,         scale, cx, cy);
-      const W = iso(-hw,   0,   gz,         scale, cx, cy);
-      const Sb = iso(0,    hh,  gz - depth, scale, cx, cy);
-      const Wb = iso(-hw,  0,   gz - depth, scale, cx, cy);
-      const Eb = iso(hw,   0,   gz - depth, scale, cx, cy);
+    // 律动悬浮
+    const floatY = Math.sin(t * 1.8 + data.gx * 2 + data.gz * 2) * 0.06;
+    const targetLift = isHovered ? 0.2 : 0;
+    liftRef.current = lerp(liftRef.current, targetLift, 0.12);
+    const targetScale = isHovered ? 1.08 : 1;
+    scaleRef.current = lerp(scaleRef.current, targetScale, 0.12);
 
-      // Left face (W → S → Sb → Wb)
-      ctx.beginPath();
-      ctx.moveTo(W.sx, W.sy);
-      ctx.lineTo(S.sx, S.sy);
-      ctx.lineTo(Sb.sx, Sb.sy);
-      ctx.lineTo(Wb.sx, Wb.sy);
-      ctx.closePath();
-      ctx.fillStyle = sideFill;
-      ctx.fill();
-      ctx.strokeStyle = stroke;
-      ctx.lineWidth = 0.8;
-      ctx.stroke();
+    group.position.y = baseY + floatY + liftRef.current;
+    group.scale.setScalar(scaleRef.current);
 
-      // Right face (E → S → Sb → Eb)
-      ctx.beginPath();
-      ctx.moveTo(E.sx, E.sy);
-      ctx.lineTo(S.sx, S.sy);
-      ctx.lineTo(Sb.sx, Sb.sy);
-      ctx.lineTo(Eb.sx, Eb.sy);
-      ctx.closePath();
-      ctx.fillStyle = sideFill;
-      ctx.fill();
-      ctx.strokeStyle = stroke;
-      ctx.lineWidth = 0.8;
-      ctx.stroke();
-
-      // Top face (N → E → S → W)
-      ctx.beginPath();
-      ctx.moveTo(N.sx, N.sy);
-      ctx.lineTo(E.sx, E.sy);
-      ctx.lineTo(S.sx, S.sy);
-      ctx.lineTo(W.sx, W.sy);
-      ctx.closePath();
-      ctx.fillStyle = topFill;
-      ctx.fill();
-      ctx.strokeStyle = stroke;
-      ctx.lineWidth = 0.8;
-      ctx.stroke();
-
-      // Subtle grid lines on top face
-      ctx.strokeStyle = stroke.replace(/[\d.]+\)$/, "0.15)");
-      ctx.lineWidth = 0.5;
-      for (let i = -1; i <= 1; i++) {
-        const a1 = iso(i * hw * 0.5, -hh, gz, scale, cx, cy);
-        const a2 = iso(i * hw * 0.5,  hh, gz, scale, cx, cy);
-        const b1 = iso(-hw, i * hh * 0.5, gz, scale, cx, cy);
-        const b2 = iso( hw, i * hh * 0.5, gz, scale, cx, cy);
-        ctx.beginPath(); ctx.moveTo(a1.sx, a1.sy); ctx.lineTo(a2.sx, a2.sy); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(b1.sx, b1.sy); ctx.lineTo(b2.sx, b2.sy); ctx.stroke();
-      }
-
-      // Label on right face
-      const labelPos = {
-        sx: (E.sx + S.sx + Sb.sx + Eb.sx) / 4,
-        sy: (E.sy + S.sy + Sb.sy + Eb.sy) / 4,
-      };
-      ctx.save();
-      ctx.font = `bold ${Math.max(9, scale * 0.22)}px monospace`;
-      ctx.fillStyle = labelColor;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText(label, labelPos.sx, labelPos.sy);
-      ctx.restore();
-
-      void t;
+    // 核心脉冲
+    if (glow && isCore) {
+      const pulse = 0.5 + 0.5 * Math.sin(t * 2.5);
+      (glow.material as THREE.MeshBasicMaterial).opacity = 0.12 + pulse * 0.1;
+      glow.scale.setScalar(1 + pulse * 0.15);
     }
+  });
 
-    // ── Draw a container box (small rhombus + two side faces) ──
-    function drawContainer(
-      t: number, scale: number, cx: number, cy: number,
-      gx: number, gy: number, gz: number,
-      gw: number, gh: number, gd: number,
-      active: boolean
-    ) {
-      const floatZ = gz + (active ? Math.sin(t * 1.8) * 0.06 : 0);
-      const hw = gw / 2, hh = gh / 2;
-      const N  = iso(gx,      gy - hh, floatZ + gd, scale, cx, cy);
-      const E  = iso(gx + hw, gy,      floatZ + gd, scale, cx, cy);
-      const S  = iso(gx,      gy + hh, floatZ + gd, scale, cx, cy);
-      const W  = iso(gx - hw, gy,      floatZ + gd, scale, cx, cy);
-      const Sb = iso(gx,      gy + hh, floatZ,      scale, cx, cy);
-      const Wb = iso(gx - hw, gy,      floatZ,      scale, cx, cy);
-      const Eb = iso(gx + hw, gy,      floatZ,      scale, cx, cy);
+  const handlePointerOver = useCallback(
+    (e: ThreeEvent<PointerEvent>) => {
+      e.stopPropagation();
+      setHoveredId(data.id);
+      document.body.style.cursor = "pointer";
+    },
+    [data.id, setHoveredId]
+  );
 
-      const accentA = active ? 0.75 : 0.28;
-      const strokeC = `rgba(246,83,16,${accentA})`;
-      const topC    = active ? "rgba(48,22,8,0.97)"  : "rgba(26,20,14,0.95)";
-      const sideC   = active ? "rgba(35,16,6,0.97)"  : "rgba(20,15,10,0.95)";
+  const handlePointerOut = useCallback(() => {
+    setHoveredId(-1);
+    document.body.style.cursor = "auto";
+  }, [setHoveredId]);
 
-      // Left face
-      ctx.beginPath();
-      ctx.moveTo(W.sx, W.sy); ctx.lineTo(S.sx, S.sy);
-      ctx.lineTo(Sb.sx, Sb.sy); ctx.lineTo(Wb.sx, Wb.sy);
-      ctx.closePath();
-      ctx.fillStyle = sideC; ctx.fill();
-      ctx.strokeStyle = strokeC; ctx.lineWidth = 0.7; ctx.stroke();
+  return (
+    <group
+      ref={groupRef}
+      position={[data.gx, baseY, data.gz]}
+      onPointerOver={handlePointerOver}
+      onPointerOut={handlePointerOut}
+      onClick={() => onClick?.(data.id)}
+    >
+      <mesh castShadow material={materials}>
+        <boxGeometry args={[0.55, 0.55, 0.55]} />
+      </mesh>
 
-      // Right face
-      ctx.beginPath();
-      ctx.moveTo(E.sx, E.sy); ctx.lineTo(S.sx, S.sy);
-      ctx.lineTo(Sb.sx, Sb.sy); ctx.lineTo(Eb.sx, Eb.sy);
-      ctx.closePath();
-      ctx.fillStyle = sideC; ctx.fill();
-      ctx.strokeStyle = strokeC; ctx.lineWidth = 0.7; ctx.stroke();
+      {/* 核心光晕 */}
+      {isCore && (
+        <mesh ref={glowRef} position={[0, -0.3, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[1.4, 1.4]} />
+          <meshBasicMaterial
+            color={theme.accent}
+            transparent
+            opacity={0.15}
+            depthWrite={false}
+          />
+        </mesh>
+      )}
 
-      // Top face
-      ctx.beginPath();
-      ctx.moveTo(N.sx, N.sy); ctx.lineTo(E.sx, E.sy);
-      ctx.lineTo(S.sx, S.sy); ctx.lineTo(W.sx, W.sy);
-      ctx.closePath();
-      ctx.fillStyle = topC; ctx.fill();
-      ctx.strokeStyle = strokeC; ctx.lineWidth = 0.7; ctx.stroke();
+      {/* 顶部小点 */}
+      <mesh position={[0.15, 0.28, -0.15]}>
+        <sphereGeometry args={[0.04, 8, 8]} />
+        <meshBasicMaterial
+          color={isHovered || isCore ? theme.accent : "#50c850"}
+        />
+      </mesh>
 
-      // Orange glow under active container
-      if (active) {
-        const pulse = 0.5 + 0.5 * Math.sin(t * 2.5);
-        const center = iso(gx, gy, floatZ, scale, cx, cy);
-        const grad = ctx.createRadialGradient(center.sx, center.sy, 0, center.sx, center.sy, scale * 0.72);
-        grad.addColorStop(0, `rgba(246,83,16,${0.14 + 0.08 * pulse})`);
-        grad.addColorStop(1, "rgba(246,83,16,0)");
-        ctx.fillStyle = grad;
-        ctx.beginPath(); ctx.ellipse(center.sx, center.sy, scale * 0.72, scale * 0.36, 0, 0, Math.PI * 2);
-        ctx.fill();
-      }
+      {/* 标注 */}
+      {(isHovered || (isCore && data.label)) && (
+        <Html position={[0.4, 0.35, 0]} center style={{ pointerEvents: "none" }}>
+          <div
+            style={{
+              background: "rgba(0,0,0,0.75)",
+              backdropFilter: "blur(4px)",
+              borderRadius: "6px",
+              padding: "6px 10px",
+              border: `1px solid ${theme.accent}40`,
+              whiteSpace: "nowrap",
+            }}
+          >
+            <div
+              style={{
+                color: theme.accent,
+                fontSize: "11px",
+                fontFamily: "monospace",
+                fontWeight: 700,
+              }}
+            >
+              {data.label || "Agent Box"}
+            </div>
+            {data.labelSub && (
+              <div
+                style={{
+                  color: theme.dim,
+                  fontSize: "9px",
+                  fontFamily: "monospace",
+                  marginTop: "2px",
+                }}
+              >
+                {data.labelSub}
+              </div>
+            )}
+          </div>
+        </Html>
+      )}
+    </group>
+  );
+}
 
-      // Icon dot on top center
-      const topC2 = iso(gx, gy, floatZ + gd + 0.01, scale, cx, cy);
-      ctx.fillStyle = active ? "rgba(246,83,16,0.7)" : "rgba(210,190,160,0.35)";
-      ctx.beginPath(); ctx.arc(topC2.sx, topC2.sy, 2.2, 0, Math.PI * 2); ctx.fill();
+/* ───────────────────────────────────────────────
+   Region Node
+   ─────────────────────────────────────────────── */
+function RegionNode({
+  position,
+  label,
+  theme,
+  phase = 0,
+}: {
+  position: [number, number, number];
+  label: string;
+  theme: ThemeColors;
+  phase?: number;
+}) {
+  const dotRef = useRef<THREE.Mesh>(null);
 
-      // Status dot top corner
-      const dotP = iso(gx + hw * 0.55, gy - hh * 0.55, floatZ + gd + 0.01, scale, cx, cy);
-      const dp = 0.5 + 0.5 * Math.sin(t * 3.2 + gx);
-      ctx.fillStyle = active
-        ? `rgba(246,83,16,${dp})`
-        : `rgba(80,200,80,${dp * 0.7})`;
-      ctx.beginPath(); ctx.arc(dotP.sx, dotP.sy, 1.4, 0, Math.PI * 2); ctx.fill();
+  useFrame((state) => {
+    const t = state.clock.elapsedTime;
+    const dot = dotRef.current;
+    if (!dot) return;
+    const pulse = 0.5 + 0.5 * Math.sin(t * 2.2 + phase);
+    (dot.material as THREE.MeshBasicMaterial).opacity = 0.4 + pulse * 0.6;
+  });
+
+  return (
+    <group position={position}>
+      {/* 背景板 */}
+      <mesh>
+        <boxGeometry args={[0.7, 0.06, 0.4]} />
+        <meshStandardMaterial
+          color={theme.nodeBg}
+          transparent
+          opacity={0.9}
+          roughness={0.8}
+        />
+      </mesh>
+      {/* 边框 */}
+      <lineSegments>
+        <edgesGeometry args={[new THREE.BoxGeometry(0.7, 0.06, 0.4)]} />
+        <lineBasicMaterial color={theme.nodeEdge} transparent opacity={0.5} />
+      </lineSegments>
+      {/* 状态点 */}
+      <mesh ref={dotRef} position={[0.28, 0.04, -0.12]}>
+        <sphereGeometry args={[0.035, 8, 8]} />
+        <meshBasicMaterial color="#50c850" transparent opacity={0.8} />
+      </mesh>
+      {/* 标签 */}
+      <Html center style={{ pointerEvents: "none" }}>
+        <span
+          style={{
+            color: theme.nodeLabel,
+            fontSize: "8px",
+            fontFamily: "monospace",
+            fontWeight: 700,
+            letterSpacing: "0.05em",
+          }}
+        >
+          {label}
+        </span>
+      </Html>
+      {/* 连接点 */}
+      <mesh position={[-0.38, 0, 0]}>
+        <sphereGeometry args={[0.03, 8, 8]} />
+        <meshBasicMaterial color={theme.nodeEdge} />
+      </mesh>
+    </group>
+  );
+}
+
+/* ───────────────────────────────────────────────
+   Animated Dashed Connection
+   ─────────────────────────────────────────────── */
+function Connection({
+  from,
+  to,
+  theme,
+  phase = 0,
+}: {
+  from: [number, number, number];
+  to: [number, number, number];
+  theme: ThemeColors;
+  phase?: number;
+}) {
+  const packetRef = useRef<THREE.Mesh>(null);
+
+  const { points, lineObj, curve } = useMemo(() => {
+    const start = new THREE.Vector3(...from);
+    const end = new THREE.Vector3(...to);
+    const mid = start.clone().lerp(end, 0.5);
+    mid.y += 0.3;
+    const c = new THREE.QuadraticBezierCurve3(start, mid, end);
+    const pts = c.getPoints(40);
+    const geo = new THREE.BufferGeometry().setFromPoints(pts);
+    const mat = new THREE.LineDashedMaterial({
+      color: theme.connection,
+      dashSize: 0.08,
+      gapSize: 0.12,
+      scale: 1,
+      transparent: true,
+      opacity: 0.45,
+      linewidth: 1,
+    });
+    const line = new THREE.Line(geo, mat);
+    line.computeLineDistances();
+    return { points: pts, lineObj: line, curve: c };
+  }, [from, to, theme]);
+
+  useFrame((state) => {
+    const t = state.clock.elapsedTime;
+    const packet = packetRef.current;
+    if (!packet) return;
+
+    const progress = ((t * 0.3 + phase) % 1 + 1) % 1;
+    const p = curve.getPointAt(progress);
+    packet.position.copy(p);
+
+    const glow = 0.5 + 0.5 * Math.sin(t * 4 + phase * 2);
+    (packet.material as THREE.MeshBasicMaterial).opacity = 0.5 + glow * 0.5;
+  });
+
+  return (
+    <group>
+      <primitive object={lineObj} />
+      <mesh ref={packetRef}>
+        <sphereGeometry args={[0.04, 8, 8]} />
+        <meshBasicMaterial color={theme.accent} transparent opacity={0.9} />
+      </mesh>
+      <mesh position={from}>
+        <sphereGeometry args={[0.035, 8, 8]} />
+        <meshBasicMaterial color={theme.accent} transparent opacity={0.6} />
+      </mesh>
+    </group>
+  );
+}
+
+/* ───────────────────────────────────────────────
+   Beacon / Ambient pulse
+   ─────────────────────────────────────────────── */
+function Beacon({
+  position,
+  theme,
+  phase = 0,
+}: {
+  position: [number, number, number];
+  theme: ThemeColors;
+  phase?: number;
+}) {
+  const ringRef = useRef<THREE.Mesh>(null);
+
+  useFrame((state) => {
+    const t = state.clock.elapsedTime;
+    const ring = ringRef.current;
+    if (!ring) return;
+    const pulse = 0.5 + 0.5 * Math.sin(t * 2.2 + phase);
+    ring.scale.setScalar(1 + pulse * 0.8);
+    (ring.material as THREE.MeshBasicMaterial).opacity = (0.06 + pulse * 0.08) * 0.5;
+  });
+
+  return (
+    <group position={position}>
+      <mesh>
+        <sphereGeometry args={[0.06, 8, 8]} />
+        <meshBasicMaterial color={theme.accent} transparent opacity={0.6} />
+      </mesh>
+      <mesh ref={ringRef} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[0.08, 0.12, 16]} />
+        <meshBasicMaterial
+          color={theme.accent}
+          transparent
+          opacity={0.1}
+          side={THREE.DoubleSide}
+          depthWrite={false}
+        />
+      </mesh>
+    </group>
+  );
+}
+
+/* ───────────────────────────────────────────────
+   Scene
+   ─────────────────────────────────────────────── */
+function Scene({ theme }: { theme: ThemeColors }) {
+  const groupRef = useRef<THREE.Group>(null);
+  const [hoveredId, setHoveredId] = useState(-1);
+
+  // 模型爆炸展开——粒子消失后触发（由 elapsedTime 驱动）
+  const modelGroupRef = useRef<THREE.Group>(null);
+
+  useFrame((state) => {
+    const mg = modelGroupRef.current;
+    if (!mg) return;
+    const t = state.clock.elapsedTime;
+
+    const START = 1.9;
+    const DURATION = 0.7;
+    if (t < START) {
+      mg.scale.setScalar(0.001);
+      return;
     }
+    const raw = Math.min(1, (t - START) / DURATION);
+    const eased = raw * raw * (3 - 2 * raw); // smoothstep
+    mg.scale.setScalar(0.001 + (1 - 0.001) * eased);
+  });
 
-    // ── Region node (flat 2D box, sits beside the platform) ──
-    function drawRegionNode(
-      t: number, scale: number, cx: number, cy: number,
-      label: string,
-      gx: number, gy: number, gz: number,
-      phase: number
-    ) {
-      const { sx, sy } = iso(gx, gy, gz, scale, cx, cy);
-      const bw = Math.max(36, scale * 0.74);
-      const bh = Math.max(20, scale * 0.42);
+  // 平台数据
+  const platforms = [
+    { y: -0.6, label: "MCP", opacity: 0.4 },
+    { y: -0.3, label: "", opacity: 0.6 },
+    { y: 0, label: "Agents", opacity: 0.85 },
+  ];
 
-      // Shadow
-      ctx.fillStyle = "rgba(0,0,0,0.3)";
-      ctx.beginPath(); ctx.rect(sx - bw / 2 + 2, sy - bh / 2 + 2, bw, bh); ctx.fill();
+  // 方块数据
+  const boxes: BoxData[] = [
+    { id: 0, gx: -0.6, gz: -0.3, label: "US-West", labelSub: "latency 12ms" },
+    { id: 1, gx: 0.3, gz: -0.6, label: "EU-Central", labelSub: "latency 24ms" },
+    { id: 2, gx: 0.0, gz: 0.15, isCore: true, label: "⚡ 127ms", labelSub: "startup" },
+    { id: 3, gx: -0.15, gz: 0.65 },
+    { id: 4, gx: 0.65, gz: 0.35 },
+  ];
 
-      // Box
-      ctx.fillStyle = "rgba(22,17,13,0.95)";
-      ctx.strokeStyle = "rgba(110,85,60,0.55)";
-      ctx.lineWidth = 0.8;
-      ctx.beginPath(); ctx.rect(sx - bw / 2, sy - bh / 2, bw, bh); ctx.fill(); ctx.stroke();
+  // 外部节点
+  const nodes = [
+    { pos: [-2.2, -0.8, 0.4] as [number, number, number], label: "US-WEST", phase: 0 },
+    { pos: [-1.5, -0.8, 2.2] as [number, number, number], label: "EU", phase: 1.5 },
+    { pos: [2.0, -0.8, -0.9] as [number, number, number], label: "ASIA", phase: 3.0 },
+  ];
 
-      // Status dot (green)
-      const dp = 0.5 + 0.5 * Math.sin(t * 2.1 + phase);
-      ctx.fillStyle = `rgba(80,200,80,${0.45 + 0.5 * dp})`;
-      ctx.beginPath(); ctx.arc(sx + bw / 2 - 6, sy - bh / 2 + 6, 2, 0, Math.PI * 2); ctx.fill();
+  // 连接线
+  const connections = [
+    { from: [-1.5, 0, 0] as [number, number, number], to: nodes[0].pos, phase: 0 },
+    { from: [-0.8, 0, 1.5] as [number, number, number], to: nodes[1].pos, phase: 1.5 },
+    { from: [1.5, 0, -0.5] as [number, number, number], to: nodes[2].pos, phase: 3.0 },
+  ];
 
-      // Label
-      ctx.font = `bold ${Math.max(7, scale * 0.16)}px monospace`;
-      ctx.fillStyle = "rgba(210,185,155,0.8)";
-      ctx.textAlign = "center"; ctx.textBaseline = "middle";
-      ctx.fillText(label, sx, sy);
+  // Beacon 位置（平台四角 + 方块上方）
+  const beacons = [
+    { pos: [-1.5, 0.05, -1.5] as [number, number, number], phase: 0 },
+    { pos: [1.5, 0.05, -1.5] as [number, number, number], phase: 1.3 },
+    { pos: [-1.5, 0.05, 1.5] as [number, number, number], phase: 2.5 },
+    { pos: [1.5, 0.05, 1.5] as [number, number, number], phase: 0.7 },
+  ];
 
-      // Connector circle left
-      ctx.strokeStyle = "rgba(110,85,60,0.45)";
-      ctx.lineWidth = 0.8;
-      ctx.beginPath(); ctx.arc(sx - bw / 2 + 6, sy, 3, 0, Math.PI * 2); ctx.stroke();
-      ctx.fillStyle = "rgba(110,85,60,0.3)";
-      ctx.beginPath(); ctx.arc(sx - bw / 2 + 6, sy, 1.5, 0, Math.PI * 2); ctx.fill();
-    }
+  return (
+    <group ref={groupRef}>
+      {/* 灯光 */}
+      <ambientLight intensity={1.5} />
+      <directionalLight position={[8, 12, 8]} intensity={1.5} />
+      <pointLight position={[0, 4, 0]} intensity={0.8} color={theme.accent} distance={12} />
+      <pointLight position={[-4, 2, -4]} intensity={0.6} color="#ffffff" distance={10} />
 
-    // ── Animated dashed connection line ──
-    function drawConnection(
-      t: number, scale: number, cx: number, cy: number,
-      from: { gx: number; gy: number; gz: number },
-      to:   { gx: number; gy: number; gz: number },
-      phase: number
-    ) {
-      const f = iso(from.gx, from.gy, from.gz, scale, cx, cy);
-      const toP = iso(to.gx, to.gy, to.gz, scale, cx, cy);
-      const offset = (t * 18 + phase * 12) % 14;
-      ctx.strokeStyle = "rgba(246,83,16,0.38)";
-      ctx.lineWidth = 0.8;
-      ctx.setLineDash([4, 10]);
-      ctx.lineDashOffset = -offset;
-      ctx.beginPath(); ctx.moveTo(f.sx, f.sy); ctx.lineTo(toP.sx, toP.sy); ctx.stroke();
-      ctx.setLineDash([]); ctx.lineDashOffset = 0;
+      {/* 开场粒子凝聚动画 */}
+      <ParticleIntro />
 
-      // Endpoint dot
-      ctx.fillStyle = "rgba(246,83,16,0.55)";
-      ctx.beginPath(); ctx.arc(f.sx, f.sy, 1.5, 0, Math.PI * 2); ctx.fill();
-    }
+      {/* 轨道控制 */}
+      <OrbitControls
+        enableDamping
+        dampingFactor={0.15}
+        minDistance={3}
+        maxDistance={16}
+        minPolarAngle={0.1}
+        maxPolarAngle={Math.PI / 2.1}
+        target={[0, 0, 0]}
+      />
 
-    // ── Main render loop ──
-    const draw = (now: number) => {
-      const dt = Math.min(0.05, (now - last) / 1000);
-      last = now;
-      const t = now / 1000;
+      {/* 平台堆叠 */}
+      <group ref={modelGroupRef}>
+      {platforms.map((p, i) => (
+        <Platform
+          key={i}
+          width={3.2 - i * 0.15}
+          depth={3.2 - i * 0.15}
+          height={0.12}
+          position={[0, p.y, 0]}
+          label={p.label}
+          theme={theme}
+        />
+      ))}
 
-      ctx.clearRect(0, 0, w, h);
+      {/* 顶部方块 */}
+      {boxes.map((box) => (
+        <AnimatedBox
+          key={box.id}
+          data={box}
+          baseY={0.4}
+          theme={theme}
+          hoveredId={hoveredId}
+          setHoveredId={setHoveredId}
+        />
+      ))}
 
-      const scale = Math.min(w, h) * 0.21;
-      const cx = w * 0.5;
-      const cy = h * 0.52;
+      {/* 外部节点 */}
+      {nodes.map((n, i) => (
+        <RegionNode key={i} position={n.pos} label={n.label} theme={theme} phase={n.phase} />
+      ))}
 
-      // ── Platforms (back to front: MCP first, then Agents) ──
-      drawPlatform(t, scale, cx, cy, 1.7, 1.7, 0.48, 0.48, {
-        topFill:   "rgba(24,19,13,0.93)",
-        sideFill:  "rgba(18,14,9,0.93)",
-        stroke:    "rgba(90,70,50,0.45)",
-        labelColor:"rgba(160,130,90,0.55)",
-        label: "MCP",
-      });
+      {/* 连接线 */}
+      {connections.map((c, i) => (
+        <Connection key={i} from={c.from} to={c.to} theme={theme} phase={c.phase} />
+      ))}
 
-      drawPlatform(t, scale, cx, cy, 1.7, 1.7, 1.02, 0.48, {
-        topFill:   "rgba(22,17,11,0.93)",
-        sideFill:  "rgba(16,12,8,0.93)",
-        stroke:    "rgba(246,83,16,0.28)",
-        labelColor:"rgba(246,83,16,0.60)",
-        label: "Agents",
-      });
+      {/* 环境脉冲 */}
+      {beacons.map((b, i) => (
+        <Beacon key={i} position={b.pos} theme={theme} phase={b.phase} />
+      ))}
+      </group>
+    </group>
+  );
+}
 
-      // ── Connections to region nodes ──
-      drawConnection(t, scale, cx, cy,
-        { gx: -1.7, gy: 0,   gz: 0.75 },
-        { gx: -2.6, gy: 0.3, gz: 0.4 }, 0);
-      drawConnection(t, scale, cx, cy,
-        { gx: -1.3, gy: 1.7, gz: 0.75 },
-        { gx: -1.8, gy: 2.6, gz: 0.4 }, 1.5);
-      drawConnection(t, scale, cx, cy,
-        { gx:  1.7, gy: -0.6, gz: 0.75 },
-        { gx:  2.5, gy: -1.1, gz: 0.4 }, 3.0);
+/* ───────────────────────────────────────────────
+   Export
+   ─────────────────────────────────────────────── */
+export default function HeroVisual() {
+  const theme = useTheme();
+  const containerRef = useRef<HTMLDivElement>(null);
 
-      // ── Region nodes ──
-      drawRegionNode(t, scale, cx, cy, "US-WEST", -2.6, 0.3, 0.4, 0.0);
-      drawRegionNode(t, scale, cx, cy, "EU",      -1.8, 2.6, 0.4, 1.5);
-      drawRegionNode(t, scale, cx, cy, "ASIA",     2.5, -1.1, 0.4, 3.0);
+  const handleWheel = useCallback((e: React.WheelEvent) => {
+    e.stopPropagation();
+  }, []);
 
-      // ── Containers (roughly back → front order) ──
-      drawContainer(t, scale, cx, cy, -0.75, -0.35, 1.02, 0.62, 0.62, 0.55, false);
-      drawContainer(t, scale, cx, cy,  0.30, -0.70, 1.02, 0.62, 0.62, 0.55, false);
-      drawContainer(t, scale, cx, cy,  0.00,  0.10, 1.02, 0.62, 0.62, 0.55, false);
-      drawContainer(t, scale, cx, cy, -0.20,  0.72, 1.02, 0.62, 0.62, 0.55, false);
-      drawContainer(t, scale, cx, cy,  0.78,  0.32, 1.02, 0.62, 0.62, 0.55, true); // ACTIVE
-
-      // ── "⚡ 127ms startup" label near active container ──
-      const labelP = iso(0.78, 0.32, 1.02 + 0.55 + 0.12, scale, cx, cy);
-      const flk = 0.82 + 0.18 * Math.sin(t * 3.8);
-      ctx.font = `bold ${Math.max(11, scale * 0.20)}px monospace`;
-      ctx.fillStyle = `rgba(246,83,16,${flk})`;
-      ctx.textAlign = "left"; ctx.textBaseline = "middle";
-      ctx.fillText("⚡ 127ms", labelP.sx + 10, labelP.sy - 5);
-      ctx.font = `${Math.max(9, scale * 0.17)}px monospace`;
-      ctx.fillStyle = `rgba(246,83,16,${flk * 0.65})`;
-      ctx.fillText("startup", labelP.sx + 10, labelP.sy + 10);
-
-      // ── Pulsing beacons ──
-      for (const b of beacons) {
-        const { sx, sy } = iso(b.gx, b.gy, b.gz, scale, cx, cy);
-        const pulse = 0.5 + 0.5 * Math.sin(t * 2.2 + b.phase);
-        ctx.fillStyle = `rgba(246,83,16,${0.06 + 0.08 * pulse})`;
-        ctx.beginPath(); ctx.arc(sx, sy, 9 + pulse * 4, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = `rgba(246,83,16,${0.5 + 0.5 * pulse})`;
-        ctx.beginPath(); ctx.arc(sx, sy, 2 + pulse * 0.8, 0, Math.PI * 2); ctx.fill();
-      }
-
-      // ── Flare ──
-      flareTimer += dt;
-      if (flareTimer > 1.8) { flareTimer = 0; flareIdx = Math.floor(Math.random() * flareSpots.length); }
-      if (flareIdx >= 0) {
-        const fp = flareSpots[flareIdx];
-        const { sx, sy } = iso(fp.gx, fp.gy, fp.gz, scale, cx, cy);
-        const k = 1 - flareTimer / 1.8;
-        ctx.fillStyle = `rgba(246,83,16,${k * 0.9})`;
-        ctx.beginPath(); ctx.arc(sx, sy, 1 + k * 3, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = `rgba(246,83,16,${k * 0.2})`;
-        ctx.beginPath(); ctx.arc(sx, sy, 5 + k * 10, 0, Math.PI * 2); ctx.fill();
-      }
-
-      // corner ticks removed
-
-      rafId = requestAnimationFrame(draw);
+  // 阻止 Canvas 区域滚轮事件冒泡导致页面滚动
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const onWheelNative = (e: WheelEvent) => {
+      e.stopPropagation();
     };
-
-    resize();
-    rafId = requestAnimationFrame(draw);
-    window.addEventListener("resize", resize);
-    return () => { cancelAnimationFrame(rafId); window.removeEventListener("resize", resize); };
+    el.addEventListener("wheel", onWheelNative, { passive: true });
+    return () => el.removeEventListener("wheel", onWheelNative);
   }, []);
 
   return (
-    <div className="absolute inset-0">
-      <canvas
-        ref={canvasRef}
-        aria-label="Isometric hardware agent infrastructure"
-        className="h-full w-full"
-      />
+    <div ref={containerRef} className="absolute inset-0" onWheel={handleWheel}>
+      <Canvas
+        camera={{
+          position: [7, 5, 7],
+          fov: 35,
+          near: 0.1,
+          far: 100,
+        } as any}
+        dpr={[1, 2]}
+        gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+        style={{ background: "transparent" }}
+      >
+        <Scene theme={theme} />
+      </Canvas>
     </div>
   );
 }
