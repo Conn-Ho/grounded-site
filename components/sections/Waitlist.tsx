@@ -27,12 +27,12 @@ export default function Waitlist({
           ))}
         </p>
 
-        <div className="mt-10">
+        <div className="mt-10 mx-auto max-w-3xl">
           <a
             href="https://tally.so"
             target="_blank"
             rel="noreferrer"
-            className="group inline-flex h-14 items-center justify-center gap-3 rounded-xl bg-[color:var(--accent)] px-14 mono text-[13px] uppercase tracking-[0.15em] text-white font-semibold shadow-[0_0_32px_rgba(246,83,16,0.35)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_48px_rgba(246,83,16,0.5)] hover:opacity-95 whitespace-nowrap"
+            className="group flex w-full h-14 items-center justify-center gap-3 rounded-xl bg-[color:var(--accent)] mono text-[13px] uppercase tracking-[0.15em] text-white font-semibold shadow-[0_0_32px_rgba(246,83,16,0.35)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_48px_rgba(246,83,16,0.5)] hover:opacity-95 whitespace-nowrap"
           >
             {dict.submit}
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden className="transition-transform duration-200 group-hover:translate-x-0.5">
