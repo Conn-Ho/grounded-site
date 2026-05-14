@@ -31,7 +31,7 @@ export default function AllProjects({
 
           {/* 返回按钮 */}
           <a
-            href="/"
+            href="/#gallery"
             className="mono inline-flex items-center gap-2 mb-4 text-[14px] uppercase tracking-wider text-[color:var(--foreground-dim)] transition-colors hover:text-[color:var(--accent)]"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
