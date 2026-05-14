@@ -16,7 +16,7 @@ export default function Hero({ dict }: { dict: Dict["hero"] }) {
     <section className="snap-section relative flex items-center overflow-hidden pt-20 pb-16">
       <ParticleField />
 
-      <div className="relative z-10 mx-auto grid w-full max-w-[1400px] grid-cols-1 items-stretch gap-10 px-6 md:px-10 lg:px-16 lg:grid-cols-2">
+      <div className="relative z-10 mx-auto grid w-full max-w-[1400px] grid-cols-1 items-stretch gap-10 px-6 md:px-10 lg:px-16 lg:grid-cols-[1.2fr_0.8fr]">
         <div>
 
           {/* Eyebrow — 小标签，与标题拉开层次 */}
@@ -101,7 +101,7 @@ export default function Hero({ dict }: { dict: Dict["hero"] }) {
 
         <div className="relative flex items-center justify-center self-stretch min-h-[420px]">
           <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,var(--accent-soft)_0%,transparent_60%)]" />
-          <div className="relative aspect-square w-full">
+          <div className="relative w-full h-full">
             <HeroVisual />
           </div>
         </div>
