@@ -1,9 +1,9 @@
 import { cookies } from "next/headers";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
-import HuntPreview from "@/components/sections/HuntPreview";
 import { getDict, parseLocale } from "@/lib/i18n";
 import { getHuntItems } from "@/lib/hunt";
+import AllProjects from "@/components/sections/AllProjects";
 
 export default async function HuntPage() {
   const store = await cookies();
@@ -15,7 +15,7 @@ export default async function HuntPage() {
     <>
       <Nav locale={locale} dict={dict.nav} switcherDict={dict.localeSwitch} />
       <main className="pt-20">
-        <HuntPreview dict={dict.hunt} items={huntItems} variant="page" />
+        <AllProjects galleryDict={dict.gallery} huntDict={dict.hunt} huntItems={huntItems} />
       </main>
       <Footer dict={dict.footer} />
     </>
