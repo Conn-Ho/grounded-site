@@ -8,7 +8,7 @@ export default function Waitlist({
 }) {
   return (
     <section id="waitlist" className="snap-section relative flex flex-col justify-center py-24 md:py-28">
-      <div className="mx-auto max-w-[900px] px-6 md:px-10 lg:px-16 text-center">
+      <div className="mx-auto max-w-[900px] px-6 md:px-10 lg:px-16 2xl:max-w-[1000px] text-center">
         <div className="mono mb-5 inline-flex items-center gap-3 text-[11px] uppercase tracking-[0.25em] text-[color:var(--accent)]">
           <span className="pulse-dot inline-block h-1.5 w-1.5 rounded-full bg-[color:var(--accent)]" />
           {dict.eyebrow}
