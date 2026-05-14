@@ -47,7 +47,7 @@ export default function GalleryHunt({
             >
               {galleryDict.title}
             </p>
-            <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-[color:var(--foreground-dim)]">
+            <p className="mt-3 text-[15px] leading-relaxed text-[color:var(--foreground-dim)] whitespace-nowrap">
               {galleryDict.desc}
             </p>
           </div>
