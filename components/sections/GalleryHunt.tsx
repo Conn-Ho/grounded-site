@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import type { Dict } from "@/lib/i18n";
 import type { HuntItem } from "@/lib/hunt";
 
@@ -18,6 +19,13 @@ export default function GalleryHunt({
   huntDict: Dict["hunt"];
   huntItems: HuntItem[];
 }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  function handleWheel(e: React.WheelEvent) {
+    if (!scrollRef.current) return;
+    e.preventDefault();
+    scrollRef.current.scrollLeft += e.deltaY;
+  }
 
   return (
     <section id="gallery" className="snap-section relative flex flex-col justify-center py-24 md:py-28">
@@ -55,6 +63,8 @@ export default function GalleryHunt({
         <div className="relative">
           <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-20 z-10 bg-gradient-to-l from-[var(--background)] to-transparent" />
           <div
+            ref={scrollRef}
+            onWheel={handleWheel}
             className="flex gap-5 overflow-x-auto snap-x snap-mandatory"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
