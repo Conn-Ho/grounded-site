@@ -41,18 +41,6 @@ const huntItems: Record<Locale, HuntItem[]> = {
       href: "#waitlist",
     },
     {
-      id: "trending-1",
-      tab: "trending",
-      type: "project",
-      title: "Open Sensor Tile",
-      source: "Hackaday",
-      meta: "sensor node · battery · modular",
-      summary:
-        "A reusable environmental sensor tile showing the kind of projects that fit the copy-and-remix workflow well.",
-      cta: "Track this build",
-      href: "#waitlist",
-    },
-    {
       id: "trending-2",
       tab: "trending",
       type: "insight",
@@ -112,18 +100,6 @@ const huntItems: Record<Locale, HuntItem[]> = {
       summary:
         "体量小、完成快，但足够覆盖采购、烧录和外壳适配这些 Amagine 核心环节。",
       cta: "从这个开始",
-      href: "#waitlist",
-    },
-    {
-      id: "trending-1",
-      tab: "trending",
-      type: "project",
-      title: "开放式传感器 Tile",
-      source: "Hackaday",
-      meta: "传感器节点 · 电池供电 · 模块化",
-      summary:
-        "这类项目很适合 copy-and-remix 工作流：结构清晰，能快速看出 Amagine 在哪里真正省时间。",
-      cta: "跟进这个项目",
       href: "#waitlist",
     },
     {
