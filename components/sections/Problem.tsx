@@ -58,7 +58,7 @@ function Line({ text, tone }: { text: string; tone: "dim" | "accent" }) {
   return (
     <span className="mono flex items-baseline gap-2 text-[15px]">
       <span className="shrink-0" style={{ minWidth: "3.8em" }} />
-      <span className="text-[color:var(--foreground-dim)]">{text}</span>
+      <span className="text-[color:var(--foreground)]">{text}</span>
     </span>
   );
 }
