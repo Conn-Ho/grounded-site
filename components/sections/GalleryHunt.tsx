@@ -1,6 +1,5 @@
-﻿"use client";
+"use client";
 
-import { useState, useMemo } from "react";
 import type { Dict } from "@/lib/i18n";
 import type { HuntItem } from "@/lib/hunt";
 
@@ -19,12 +18,6 @@ export default function GalleryHunt({
   huntDict: Dict["hunt"];
   huntItems: HuntItem[];
 }) {
-  const [activeTab, setActiveTab] = useState(huntDict.tabs[0]?.key ?? "match");
-
-  const visibleItems = useMemo(
-    () => huntItems.filter((item) => item.tab === activeTab),
-    [activeTab, huntItems]
-  );
 
   return (
     <section id="gallery" className="snap-section relative flex flex-col justify-center py-24 md:py-28">
@@ -56,27 +49,6 @@ export default function GalleryHunt({
           >
             {galleryDict.browseAll}
           </a>
-        </div>
-
-        {/* ── 标签切换（控制后半段 Hunt 卡片）── */}
-        <div className="mb-6 flex flex-wrap gap-3">
-          {huntDict.tabs.map((tab) => {
-            const active = tab.key === activeTab;
-            return (
-              <button
-                key={tab.key}
-                type="button"
-                onClick={() => setActiveTab(tab.key)}
-                className={`px-4 py-2 text-[12px] uppercase tracking-wider transition-colors ${
-                  active
-                    ? "border border-[color:var(--accent)] bg-[color:var(--accent-soft)] text-[color:var(--accent)]"
-                    : "border border-[color:var(--card-border)] bg-[color:var(--card-bg)] text-[color:var(--foreground-dim)] hover:text-[color:var(--foreground)]"
-                }`}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
         </div>
 
         {/* ── 统一横向滚动区域 ── */}
@@ -143,9 +115,9 @@ export default function GalleryHunt({
               </article>
             ))}
 
-            {/* ── 后段：Hunt 项目卡（图文结构，与 Gallery 统一）── */}
-            {visibleItems.length ? (
-              visibleItems.map((item, idx) => {
+            {/* ── 后段：Hunt 项目卡（直接展示，无 Tab 筛选）── */}
+            {huntItems.length ? (
+              huntItems.map((item, idx) => {
                 const isInsight = item.type === "insight";
                 const cover = covers[(idx + covers.length - 1) % covers.length];
                 return (
