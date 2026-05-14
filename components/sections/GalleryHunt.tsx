@@ -51,13 +51,19 @@ export default function GalleryHunt({
           </a>
         </div>
 
-        {/* ── 统一网格区域 ── */}
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        {/* ── 横向滚动：默认展示 3 张，后续卡片滚动可见 ── */}
+        <div className="relative">
+          <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-20 z-10 bg-gradient-to-l from-[var(--background)] to-transparent" />
+          <div
+            className="flex gap-5 overflow-x-auto snap-x snap-mandatory"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
             {/* ── 前段：Gallery 图文卡 ── */}
             {galleryDict.projects.map((p, idx) => (
               <article
                 key={p.slug}
-                className="group overflow-hidden border border-[color:var(--card-border)] bg-[color:var(--card-bg)] transition-colors hover:border-[color:var(--accent-line)]"
+                className="group snap-start flex-shrink-0 overflow-hidden border border-[color:var(--card-border)] bg-[color:var(--card-bg)] transition-colors hover:border-[color:var(--accent-line)]"
+                style={{ width: "calc((100% - 2 * 1.25rem) / 3)" }}
               >
                 {/* 封面 — 点阵纹理 */}
                 <div
@@ -114,7 +120,8 @@ export default function GalleryHunt({
               return (
                 <article
                   key={item.id}
-                  className="group overflow-hidden border border-[color:var(--card-border)] bg-[color:var(--card-bg)] transition-colors hover:border-[color:var(--accent-line)]"
+                  className="group snap-start flex-shrink-0 overflow-hidden border border-[color:var(--card-border)] bg-[color:var(--card-bg)] transition-colors hover:border-[color:var(--accent-line)]"
+                  style={{ width: "calc((100% - 2 * 1.25rem) / 3)" }}
                 >
                   <div className={`relative aspect-[4/3] overflow-hidden bg-gradient-to-br ${cover}`}>
                     <svg className="absolute inset-0 h-full w-full opacity-40" aria-hidden>
@@ -153,6 +160,7 @@ export default function GalleryHunt({
               );
             })}
 
+          </div>
         </div>
 
       </div>
