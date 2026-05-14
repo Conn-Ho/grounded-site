@@ -43,9 +43,9 @@ export default function HuntPreview({
           </div>
         )}
 
-        {items.length ? (
+        {items.filter(i => i.type !== "insight").length ? (
           <div className={`grid gap-5 ${isPage ? "md:grid-cols-2 xl:grid-cols-3" : "md:grid-cols-2"}`}>
-            {items.map((item, idx) => {
+            {items.filter(i => i.type !== "insight").map((item, idx) => {
               const isInsight = item.type === "insight";
               const cover = covers[idx % covers.length];
               return (
