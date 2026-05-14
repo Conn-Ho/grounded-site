@@ -54,9 +54,11 @@ function Line({ text, tone }: { text: string; tone: "dim" | "accent" }) {
     );
   }
 
+  // 无前缀的普通行 — 缩进与内容列对齐（前缀 3.8em + gap 0.5rem）
   return (
-    <span className="mono text-[15px] text-[color:var(--foreground-dim)]">
-      {text}
+    <span className="mono flex items-baseline gap-2 text-[15px]">
+      <span className="shrink-0" style={{ minWidth: "3.8em" }} />
+      <span className="text-[color:var(--foreground-dim)]">{text}</span>
     </span>
   );
 }
