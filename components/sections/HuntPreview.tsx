@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo, useState } from "react";
 import type { Dict } from "@/lib/i18n";
 import type { HuntItem } from "@/lib/hunt";
 import SectionHeading from "../SectionHeading";
@@ -20,21 +19,15 @@ export default function HuntPreview({
   items: HuntItem[];
   variant?: "preview" | "page";
 }) {
-  const [activeTab, setActiveTab] = useState(dict.tabs[0]?.key ?? "match");
   const isPage = variant === "page";
-
-  const visibleItems = useMemo(
-    () => items.filter((item) => item.tab === activeTab),
-    [activeTab, items]
-  );
 
   return (
     <section
       id="hunt"
       className="snap-section relative flex flex-col justify-center py-24 md:py-28"
     >
-      <div className="mx-auto max-w-[1400px] px-6 md:px-10">
-        {isPage ? null : (
+      <div className="mx-auto w-full max-w-[1400px] px-6 md:px-10 lg:px-16">
+        {!isPage && (
           <div className="mb-10 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
             <SectionHeading
               eyebrow={dict.eyebrow}
@@ -50,29 +43,9 @@ export default function HuntPreview({
           </div>
         )}
 
-        <div className="mb-8 flex flex-wrap gap-3">
-          {dict.tabs.map((tab) => {
-            const active = tab.key === activeTab;
-            return (
-              <button
-                key={tab.key}
-                type="button"
-                onClick={() => setActiveTab(tab.key)}
-                className={`mono px-4 py-2 text-[12px] uppercase tracking-wider transition-colors ${
-                  active
-                    ? "hex-chip border border-[color:var(--accent)] bg-[color:var(--accent-soft)] text-[color:var(--accent)]"
-                    : "border border-[color:var(--card-border)] bg-[color:var(--card-bg)] text-[color:var(--foreground-dim)] hover:text-[color:var(--foreground)]"
-                }`}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
-
-        {visibleItems.length ? (
+        {items.length ? (
           <div className={`grid gap-5 ${isPage ? "md:grid-cols-2 xl:grid-cols-3" : "md:grid-cols-2"}`}>
-            {visibleItems.map((item, idx) => {
+            {items.map((item, idx) => {
               const isInsight = item.type === "insight";
               const cover = covers[idx % covers.length];
               return (
