@@ -51,20 +51,13 @@ export default function GalleryHunt({
           </a>
         </div>
 
-        {/* ── 统一横向滚动区域 ── */}
-        <div className="relative">
-          {/* 右侧渐隐暗示可继续滚动 */}
-          <div className="pointer-events-none absolute right-0 top-0 bottom-4 w-24 z-10 bg-gradient-to-l from-[var(--background)] to-transparent" />
-
-          <div
-            className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory"
-            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-          >
-            {/* ── 前段：Gallery 图文卡（始终可见）── */}
+        {/* ── 统一网格区域 ── */}
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {/* ── 前段：Gallery 图文卡 ── */}
             {galleryDict.projects.map((p, idx) => (
               <article
                 key={p.slug}
-                className="group w-[300px] flex-shrink-0 snap-start overflow-hidden border border-[color:var(--card-border)] bg-[color:var(--card-bg)] transition-colors hover:border-[color:var(--accent-line)]"
+                className="group overflow-hidden border border-[color:var(--card-border)] bg-[color:var(--card-bg)] transition-colors hover:border-[color:var(--accent-line)]"
               >
                 {/* 封面 — 点阵纹理 */}
                 <div
@@ -121,7 +114,7 @@ export default function GalleryHunt({
               return (
                 <article
                   key={item.id}
-                  className="group w-[300px] flex-shrink-0 snap-start overflow-hidden border border-[color:var(--card-border)] bg-[color:var(--card-bg)] transition-colors hover:border-[color:var(--accent-line)]"
+                  className="group overflow-hidden border border-[color:var(--card-border)] bg-[color:var(--card-bg)] transition-colors hover:border-[color:var(--accent-line)]"
                 >
                   <div className={`relative aspect-[4/3] overflow-hidden bg-gradient-to-br ${cover}`}>
                     <svg className="absolute inset-0 h-full w-full opacity-40" aria-hidden>
@@ -160,7 +153,6 @@ export default function GalleryHunt({
               );
             })}
 
-          </div>
         </div>
 
       </div>
