@@ -26,7 +26,7 @@ export default async function Home() {
         <Hero dict={dict.hero} />
         <Problem dict={dict.problem} />
         <Loop dict={dict.loop} />
-        <GalleryHunt galleryDict={dict.gallery} huntDict={dict.hunt} huntItems={huntItems} />
+        <GalleryHunt galleryDict={dict.gallery} huntDict={dict.hunt} />
         <Packages dict={dict.packages} />
         <FAQ dict={dict.faq} />
         <Waitlist dict={dict.waitlist} locale={locale} />
