@@ -168,3 +168,69 @@ body {
 .marquee {
   animation: marquee 40s linear infinite;
 }
+
+/* ── 超宽屏响应式容器 ── */
+.container-wide {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 1400px;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .container-wide {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-wide {
+    padding-left: 4rem;
+    padding-right: 4rem;
+  }
+}
+
+@media (min-width: 2400px) {
+  .container-wide {
+    max-width: 1600px;
+  }
+}
+
+@media (min-width: 2560px) {
+  .container-wide {
+    max-width: 2000px;
+  }
+}
+
+@media (min-width: 3440px) {
+  .container-wide {
+    max-width: 2400px;
+  }
+}
+
+/* ── Hero 响应式画框比例 ── */
+.hero-frame {
+  aspect-ratio: 16 / 9;
+}
+
+@media (min-width: 2400px) {
+  .hero-frame {
+    aspect-ratio: 2 / 1;
+  }
+}
+
+@media (min-width: 2560px) {
+  .hero-frame {
+    aspect-ratio: 21 / 9;
+  }
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.9; }
+}
+.animate-breathe {
+  animation: breathe 2.5s ease-in-out infinite;
+}

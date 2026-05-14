@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import type { Dict } from "@/lib/i18n";
 import type { HuntItem } from "@/lib/hunt";
 
@@ -20,6 +20,35 @@ export default function GalleryHunt({
   huntItems: HuntItem[];
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    function check() {
+      setCanScrollRight(el!.scrollLeft + el!.clientWidth < el!.scrollWidth - 1);
+    }
+
+    el.addEventListener("scroll", check, { passive: true });
+    const ro = new ResizeObserver(() => check());
+    ro.observe(el);
+    check();
+
+    return () => {
+      el.removeEventListener("scroll", check);
+      ro.disconnect();
+    };
+  }, []);
+
+  function handleScrollRight() {
+    if (!scrollRef.current) return;
+    const card = scrollRef.current.firstElementChild;
+    if (!card) return;
+    const cardWidth = card.getBoundingClientRect().width;
+    const gap = 20; // gap-5
+    scrollRef.current.scrollBy({ left: cardWidth + gap, behavior: "smooth" });
+  }
 
   function handleWheel(e: React.WheelEvent) {
     if (!scrollRef.current) return;
@@ -29,7 +58,7 @@ export default function GalleryHunt({
 
   return (
     <section id="gallery" className="snap-section relative flex flex-col justify-center py-24 md:py-28">
-      <div className="mx-auto w-full max-w-[1400px] px-6 md:px-10 lg:px-16">
+      <div className="container-wide">
 
         {/* ── 头部 ── */}
         <div className="mb-10 flex items-end justify-between gap-8">
@@ -61,7 +90,24 @@ export default function GalleryHunt({
 
         {/* ── 横向滚动：默认展示 3 张，后续卡片滚动可见 ── */}
         <div className="relative">
-          <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-20 z-10 bg-gradient-to-l from-[var(--background)] to-transparent" />
+          {canScrollRight && (
+            <button
+              onClick={handleScrollRight}
+              aria-label="向右滚动"
+              className="absolute right-0 top-0 bottom-0 z-20 flex items-center justify-center w-10 bg-transparent border-0 outline-none cursor-pointer group"
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                className="animate-breathe text-[color:var(--accent)] transition-all group-hover:scale-110"
+                aria-hidden
+              >
+                <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+          )}
           <div
             ref={scrollRef}
             onWheel={handleWheel}
