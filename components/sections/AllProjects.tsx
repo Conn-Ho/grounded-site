@@ -22,25 +22,24 @@ export default function AllProjects({
     <section className="relative py-24 md:py-28">
       <div className="mx-auto w-full max-w-[1400px] px-6 md:px-10 lg:px-16">
 
-        {/* 返回按钮 */}
-        <div className="mb-8">
-          <a
-            href="/"
-            className="mono inline-flex items-center gap-2 text-[12px] uppercase tracking-wider text-[color:var(--foreground-dim)] transition-colors hover:text-[color:var(--accent)]"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
-              <path d="M19 12H5M11 6l-6 6 6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            返回
-          </a>
-        </div>
-
         {/* 标题 */}
         <div className="mb-10">
           <div className="mb-4 flex items-center gap-3 text-[11px] uppercase tracking-[0.25em] text-[color:var(--accent)]">
             <span className="h-px w-8 bg-[color:var(--accent-line)]" />
             {huntDict.eyebrow}
           </div>
+
+          {/* 返回按钮 */}
+          <a
+            href="/"
+            className="mono inline-flex items-center gap-2 mb-4 text-[14px] uppercase tracking-wider text-[color:var(--foreground-dim)] transition-colors hover:text-[color:var(--accent)]"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path d="M19 12H5M11 6l-6 6 6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            返回
+          </a>
+
           <h2 className="display-font text-[clamp(2rem,4.5vw,3.6rem)] leading-[1.05]">
             {galleryDict.title}
           </h2>
