@@ -4,7 +4,7 @@ import SectionHeading from "../SectionHeading";
 export default function FAQ({ dict }: { dict: Dict["faq"] }) {
   return (
     <section id="faq" className="snap-section relative flex flex-col justify-center py-24 md:py-28">
-      <div className="mx-auto w-full max-w-[1400px] px-6 md:px-10 lg:px-16">
+      <div className="container-wide">
         <SectionHeading eyebrow={dict.eyebrow} title={dict.title} />
 
         <div className="divide-y divide-[color:var(--card-border)] border-y border-[color:var(--card-border)]">
