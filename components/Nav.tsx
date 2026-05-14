@@ -39,7 +39,7 @@ export default function Nav({
           : "border-b border-white/[0.06] bg-[#0a0908]/60 backdrop-blur-lg"
       }`}
     >
-      <div className="mx-auto flex h-16 max-w-[1400px] items-center justify-between px-6 md:px-10 lg:px-16 relative">
+      <div className="mx-auto flex h-16 container-wide items-center justify-between relative">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 shrink-0 z-10">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
