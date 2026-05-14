@@ -35,7 +35,7 @@ function Line({ text, tone }: { text: string; tone: "dim" | "accent" }) {
       <span className="mono flex items-baseline gap-2 text-[15px]">
         {/* 前缀 — 固定宽度让内容列垂直对齐 */}
         <span
-          className="shrink-0 text-[color:var(--foreground-dim)]"
+          className={`shrink-0 ${isAgent ? "text-[color:var(--accent)]" : "text-[color:var(--foreground-dim)]"}`}
           style={{ minWidth: "3.8em" }}
         >
           {prefix}
