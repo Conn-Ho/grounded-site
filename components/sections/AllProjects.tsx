@@ -31,7 +31,7 @@ export default function AllProjects({
           <h2 className="display-font text-[clamp(2rem,4.5vw,3.6rem)] leading-[1.05]">
             {galleryDict.title}
           </h2>
-          <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-[color:var(--foreground-dim)]">
+          <p className="mt-3 text-[15px] leading-relaxed text-[color:var(--foreground-dim)] whitespace-nowrap">
             {galleryDict.desc}
           </p>
         </div>
