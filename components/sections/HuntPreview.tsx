@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import type { Dict } from "@/lib/i18n";
 import type { HuntItem } from "@/lib/hunt";
 import SectionHeading from "../SectionHeading";
@@ -20,14 +21,15 @@ export default function HuntPreview({
   variant?: "preview" | "page";
 }) {
   const isPage = variant === "page";
+  const visibleItems = useMemo(() => items, [items]);
 
   return (
     <section
       id="hunt"
       className="snap-section relative flex flex-col justify-center py-24 md:py-28"
     >
-      <div className="mx-auto w-full max-w-[1400px] px-6 md:px-10 lg:px-16">
-        {!isPage && (
+      <div className="mx-auto max-w-[1400px] px-6 md:px-10">
+        {isPage ? null : (
           <div className="mb-10 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
             <SectionHeading
               eyebrow={dict.eyebrow}
@@ -43,9 +45,10 @@ export default function HuntPreview({
           </div>
         )}
 
-        {items.filter(i => i.type !== "insight").length ? (
+
+        {visibleItems.length ? (
           <div className={`grid gap-5 ${isPage ? "md:grid-cols-2 xl:grid-cols-3" : "md:grid-cols-2"}`}>
-            {items.filter(i => i.type !== "insight").map((item, idx) => {
+            {visibleItems.map((item, idx) => {
               const isInsight = item.type === "insight";
               const cover = covers[idx % covers.length];
               return (

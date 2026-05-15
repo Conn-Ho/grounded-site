@@ -1,6 +1,6 @@
-"use client";
+﻿"use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useMemo } from "react";
 import type { Dict } from "@/lib/i18n";
 import type { HuntItem } from "@/lib/hunt";
 
@@ -19,46 +19,11 @@ export default function GalleryHunt({
   huntDict: Dict["hunt"];
   huntItems: HuntItem[];
 }) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [canScrollRight, setCanScrollRight] = useState(false);
-
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-
-    function check() {
-      setCanScrollRight(el!.scrollLeft + el!.clientWidth < el!.scrollWidth - 1);
-    }
-
-    el.addEventListener("scroll", check, { passive: true });
-    const ro = new ResizeObserver(() => check());
-    ro.observe(el);
-    check();
-
-    return () => {
-      el.removeEventListener("scroll", check);
-      ro.disconnect();
-    };
-  }, []);
-
-  function handleScrollRight() {
-    if (!scrollRef.current) return;
-    const card = scrollRef.current.firstElementChild;
-    if (!card) return;
-    const cardWidth = card.getBoundingClientRect().width;
-    const gap = 20; // gap-5
-    scrollRef.current.scrollBy({ left: cardWidth + gap, behavior: "smooth" });
-  }
-
-  function handleWheel(e: React.WheelEvent) {
-    if (!scrollRef.current) return;
-    e.preventDefault();
-    scrollRef.current.scrollLeft += e.deltaY;
-  }
+  const visibleItems = useMemo(() => huntItems, [huntItems]);
 
   return (
     <section id="gallery" className="snap-section relative flex flex-col justify-center py-24 md:py-28">
-      <div className="container-wide">
+      <div className="mx-auto w-full max-w-[1400px] px-6 md:px-10 lg:px-16">
 
         {/* ── 头部 ── */}
         <div className="mb-10 flex items-end justify-between gap-8">
@@ -88,38 +53,20 @@ export default function GalleryHunt({
           </a>
         </div>
 
-        {/* ── 横向滚动：默认展示 3 张，后续卡片滚动可见 ── */}
+        {/* ── 统一横向滚动区域 ── */}
         <div className="relative">
-          {canScrollRight && (
-            <button
-              onClick={handleScrollRight}
-              aria-label="向右滚动"
-              className="absolute right-0 top-0 bottom-0 z-20 flex items-center justify-center w-10 bg-transparent border-0 outline-none cursor-pointer group"
-            >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                className="animate-breathe text-[color:var(--accent)] transition-all group-hover:scale-110"
-                aria-hidden
-              >
-                <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-          )}
+          {/* 右侧渐隐暗示可继续滚动 */}
+          <div className="pointer-events-none absolute right-0 top-0 bottom-4 w-24 z-10 bg-gradient-to-l from-[var(--background)] to-transparent" />
+
           <div
-            ref={scrollRef}
-            onWheel={handleWheel}
-            className="flex gap-5 overflow-x-auto snap-x snap-mandatory"
+            className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
-            {/* ── 前段：Gallery 图文卡 ── */}
+            {/* ── 前段：Gallery 图文卡（始终可见）── */}
             {galleryDict.projects.map((p, idx) => (
               <article
                 key={p.slug}
-                className="group snap-start flex-shrink-0 overflow-hidden border border-[color:var(--card-border)] bg-[color:var(--card-bg)] transition-colors hover:border-[color:var(--accent-line)]"
-                style={{ width: "calc((100% - 2 * 1.25rem) / 3)" }}
+                className="group w-[300px] flex-shrink-0 snap-start overflow-hidden border border-[color:var(--card-border)] bg-[color:var(--card-bg)] transition-colors hover:border-[color:var(--accent-line)]"
               >
                 {/* 封面 — 点阵纹理 */}
                 <div
@@ -170,52 +117,72 @@ export default function GalleryHunt({
               </article>
             ))}
 
-            {/* ── 后段：Hunt project 卡（接续横排）── */}
-            {huntItems.filter(i => i.type === "project").map((item, idx) => {
-              const cover = covers[(idx + galleryDict.projects.length) % covers.length];
-              return (
-                <article
-                  key={item.id}
-                  className="group snap-start flex-shrink-0 overflow-hidden border border-[color:var(--card-border)] bg-[color:var(--card-bg)] transition-colors hover:border-[color:var(--accent-line)]"
-                  style={{ width: "calc((100% - 2 * 1.25rem) / 3)" }}
-                >
-                  <div className={`relative aspect-[4/3] overflow-hidden bg-gradient-to-br ${cover}`}>
-                    <svg className="absolute inset-0 h-full w-full opacity-40" aria-hidden>
-                      <defs>
-                        <pattern id={`dots-hunt-${item.id}`} width="12" height="12" patternUnits="userSpaceOnUse">
-                          <circle cx="1.5" cy="1.5" r="1" fill="var(--accent)" />
-                        </pattern>
-                      </defs>
-                      <rect width="100%" height="100%" fill={`url(#dots-hunt-${item.id})`} />
-                    </svg>
-                    <div className="absolute top-3 left-3">
-                      <span className="px-2 py-1 text-[10px] uppercase tracking-wider bg-[color:var(--accent-soft)] text-[color:var(--accent)]">
-                        {item.source}
-                      </span>
-                    </div>
-                    <div className="absolute bottom-3 left-4 text-[10px] uppercase tracking-wider text-[color:var(--foreground-dim)]">
-                      {item.meta}
-                    </div>
-                  </div>
-                  <div className="p-5">
-                    <h3 className="display-font mb-3 text-[17px] tracking-wide leading-tight">{item.title}</h3>
-                    <p className="mb-4 text-[13px] leading-relaxed text-[color:var(--foreground-dim)]">{item.summary}</p>
-                    <a
-                      href={item.href}
-                      target={item.href.startsWith("http") ? "_blank" : undefined}
-                      rel={item.href.startsWith("http") ? "noreferrer" : undefined}
-                      className="inline-flex items-center gap-2 text-[12px] uppercase tracking-wider text-[color:var(--accent)] transition-colors hover:text-[color:var(--accent-hover)]"
-                    >
-                      {item.cta}
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
-                        <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            {/* ── 后段：Hunt 项目卡（图文结构，与 Gallery 统一）── */}
+            {visibleItems.length ? (
+              visibleItems.map((item, idx) => {
+                const isInsight = item.type === "insight";
+                const cover = covers[(idx + covers.length - 1) % covers.length];
+                return (
+                  <article
+                    key={item.id}
+                    className="group w-[300px] flex-shrink-0 snap-start overflow-hidden border border-[color:var(--card-border)] bg-[color:var(--card-bg)] transition-colors hover:border-[color:var(--accent-line)]"
+                  >
+                    {/* 封面 — 点阵纹理 */}
+                    <div className={`relative aspect-[4/3] overflow-hidden bg-gradient-to-br ${cover}`}>
+                      <svg className="absolute inset-0 h-full w-full opacity-40" aria-hidden>
+                        <defs>
+                          <pattern id={`dots-hunt-${item.id}`} width="12" height="12" patternUnits="userSpaceOnUse">
+                            <circle cx="1.5" cy="1.5" r="1" fill="var(--accent)" />
+                          </pattern>
+                        </defs>
+                        <rect width="100%" height="100%" fill={`url(#dots-hunt-${item.id})`} />
                       </svg>
-                    </a>
-                  </div>
-                </article>
-              );
-            })}
+                      {/* 类型角标 */}
+                      <div className="absolute top-3 left-3">
+                        <span className={`px-2 py-1 text-[10px] uppercase tracking-wider ${
+                          isInsight
+                            ? "bg-[rgba(92,173,255,0.18)] text-[#8fc4ff]"
+                            : "bg-[color:var(--accent-soft)] text-[color:var(--accent)]"
+                        }`}>
+                          {item.type}
+                        </span>
+                      </div>
+                      {/* meta 信息 */}
+                      <div className="absolute bottom-3 left-4 text-[10px] uppercase tracking-wider text-[color:var(--foreground-dim)]">
+                        {item.meta || item.source}
+                      </div>
+                    </div>
 
+                    {/* 文字区 */}
+                    <div className="p-5">
+                      <h3 className="display-font mb-3 text-[17px] tracking-wide leading-tight">
+                        {item.title}
+                      </h3>
+                      <p className="mb-4 text-[13px] leading-relaxed text-[color:var(--foreground-dim)]">
+                        {item.summary}
+                      </p>
+                      <a
+                        href={item.href}
+                        target={item.href.startsWith("http") ? "_blank" : undefined}
+                        rel={item.href.startsWith("http") ? "noreferrer" : undefined}
+                        className="inline-flex items-center gap-2 text-[12px] uppercase tracking-wider text-[color:var(--accent)] transition-colors hover:text-[color:var(--accent-hover)]"
+                      >
+                        {item.cta}
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+                          <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </a>
+                    </div>
+                  </article>
+                );
+              })
+            ) : (
+              <div className="w-[300px] flex-shrink-0 snap-start border border-[color:var(--card-border)] bg-[color:var(--card-bg)] p-8 flex items-center justify-center">
+                <p className="text-[12px] uppercase tracking-wider text-[color:var(--muted)]">
+                  {huntDict.empty}
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
