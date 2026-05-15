@@ -14,7 +14,7 @@ export default function Hero({ dict }: { dict: Dict["hero"] }) {
   const parts = description.split(/(__[^_]+__)/g);
 
   return (
-    <section className="snap-section relative flex items-center overflow-hidden pt-20 pb-16">
+    <section className="snap-section relative flex items-center overflow-hidden pt-16 pb-12 md:pt-20 md:pb-16">
       <ParticleField />
 
       {/* 响应式画框 — Canvas 全幅背景 + 文字浮动左上 */}
@@ -24,8 +24,8 @@ export default function Hero({ dict }: { dict: Dict["hero"] }) {
           <HeroVisual />
         </div>
 
-        {/* 文字区域浮动在左上角 */}
-        <div className="absolute top-0 left-0 max-w-[520px] p-8 md:p-10 lg:p-12">
+        {/* 文字区域浮动在左侧，垂直居中 */}
+        <div className="absolute top-0 bottom-0 left-0 flex flex-col justify-center max-w-[480px] min-[1920px]:max-w-[600px] p-6 md:p-10 lg:p-12 min-[1920px]:p-16">
           <div className="relative z-20">
 
             {/* Eyebrow */}
@@ -39,7 +39,7 @@ export default function Hero({ dict }: { dict: Dict["hero"] }) {
               className="normal-case font-[800]"
               style={{
                 fontFamily: "var(--font-geist-sans), sans-serif",
-                fontSize: "clamp(2.2rem, 3.6vw, 4.4rem)",
+                fontSize: "clamp(2.2rem, 3.6vw, 5.5rem)",
                 lineHeight: 1.28,
                 letterSpacing: "0em",
               }}
@@ -53,9 +53,9 @@ export default function Hero({ dict }: { dict: Dict["hero"] }) {
               className="text-[color:var(--foreground-dim)]"
               style={{
                 marginTop: "1.75rem",
-                fontSize: "16px",
+                fontSize: "clamp(16px, 1.2vw, 22px)",
                 lineHeight: 1.72,
-                maxWidth: "420px",
+                maxWidth: "520px",
               }}
             >
               {parts.map((p, i) => {
@@ -106,32 +106,20 @@ export default function Hero({ dict }: { dict: Dict["hero"] }) {
           </div>
         </div>
 
-        {/* 黄金比例分割 — 左侧 38.2% 空白 + 底部框架，右侧 61.8% DemoVideoFrame */}
+        {/* 黄金比例分割 — 左侧 38.2% 文字区，右侧 61.8% 视觉区 */}
         <div className="absolute inset-0 grid grid-cols-[38.2fr_61.8fr] pointer-events-none">
-          <div className="flex flex-col justify-end p-8 md:p-10 lg:p-12">
-            {/* 底部数据卡片 */}
-            <div className="pointer-events-auto grid grid-cols-3 gap-3" style={{ maxWidth: "340px" }}>
-              {[
-                { value: "6", label: "Open-source packages" },
-                { value: "8+", label: "Reference builds" },
-                { value: "∞", label: "Human waiting saved" },
-              ].map((s, i) => (
-                <div key={i} className="rounded-lg border border-[color:var(--card-border)] bg-[#0a0908]/60 backdrop-blur-sm px-4 py-3">
-                  <span className="block font-bold text-[color:var(--accent)] leading-none" style={{ fontSize: "clamp(1.3rem, 1.8vw, 1.6rem)" }}>
-                    {s.value}
-                  </span>
-                  <span className="block mt-1 text-[10px] leading-snug text-[color:var(--muted)]">{s.label}</span>
-                </div>
-              ))}
-            </div>
+          <div className="flex flex-col justify-center p-6 md:p-10 lg:p-12 min-[1920px]:p-16">
+            {/* 左侧留空，文字由上方 absolute 定位区承载 */}
           </div>
 
-          {/* 右栏：DemoVideoFrame */}
-          <div className="pointer-events-auto flex items-center justify-center p-8 md:p-10 lg:p-12">
-            <DemoVideoFrame
-              label="See how it works"
-              previewSrc="/hero-preview.png"
-            />
+          {/* 右栏：大面积 DemoVideoFrame */}
+          <div className="pointer-events-auto flex items-center justify-center p-4 md:p-8 lg:p-12 min-[1920px]:p-16">
+            <div className="w-full h-full max-h-[90%]">
+              <DemoVideoFrame
+                label="See how it works"
+                previewSrc="/hero-preview.png"
+              />
+            </div>
           </div>
         </div>
       </div>
