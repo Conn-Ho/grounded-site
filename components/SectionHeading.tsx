@@ -15,7 +15,7 @@ export default function SectionHeading({
         <span className="h-px w-8 bg-[color:var(--accent-line)]" />
         {eyebrow}
       </div>
-      <h2 className="display-font text-[clamp(2rem,4.5vw,3.6rem)] leading-[1.02] whitespace-nowrap">
+      <h2 className="display-font text-[clamp(2rem,4.5vw,3.6rem)] leading-[1.02]">
         {title.split("\n").map((line, i, arr) => (
           <span key={i}>
             {line}
