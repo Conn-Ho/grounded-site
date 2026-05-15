@@ -169,61 +169,67 @@ body {
   animation: marquee 40s linear infinite;
 }
 
-/* ── 超宽屏响应式容器 ── */
+/* ── 全宽自适应容器 ──
+   Nike 风格：内容随屏幕自然流淌，不在超宽屏上缩成一团。
+   只控制两侧呼吸边距，不设 max-width 天花板。 ── */
 .container-wide {
   margin-inline: auto;
   width: 100%;
-  max-width: 1400px;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 640px) {
+  .container-wide {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
   .container-wide {
     padding-left: 2.5rem;
     padding-right: 2.5rem;
   }
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1440px) {
   .container-wide {
     padding-left: 4rem;
     padding-right: 4rem;
   }
 }
 
-@media (min-width: 2400px) {
+@media (min-width: 1920px) {
   .container-wide {
-    max-width: 1600px;
+    padding-left: 5rem;
+    padding-right: 5rem;
   }
 }
 
 @media (min-width: 2560px) {
   .container-wide {
-    max-width: 2000px;
+    padding-left: 6rem;
+    padding-right: 6rem;
   }
 }
 
-@media (min-width: 3440px) {
-  .container-wide {
-    max-width: 2400px;
-  }
-}
-
-/* ── Hero 响应式画框比例 ── */
+/* ── Hero 响应式画框 ──
+   在超宽屏上保持 21:9 电影感，充分利用横向空间。 ── */
 .hero-frame {
+  width: 100%;
   aspect-ratio: 16 / 9;
 }
 
-@media (min-width: 2400px) {
+@media (min-width: 1440px) {
   .hero-frame {
-    aspect-ratio: 2 / 1;
+    aspect-ratio: 21 / 9;
   }
 }
 
 @media (min-width: 2560px) {
   .hero-frame {
-    aspect-ratio: 21 / 9;
+    aspect-ratio: 2.39 / 1;
   }
 }
 
