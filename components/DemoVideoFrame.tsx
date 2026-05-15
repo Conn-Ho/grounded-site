@@ -66,21 +66,8 @@ export default function DemoVideoFrame({
       {/* ── Content area ── */}
       <div style={{ position: "relative", aspectRatio: "16/10", overflow: "hidden" }}>
 
-        {/* Preview image or gradient placeholder */}
-        {previewSrc ? (
-          <img
-            src={previewSrc}
-            alt="Demo preview"
-            style={{
-              position: "absolute",
-              inset: 0,
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              display: playing ? "none" : "block",
-            }}
-          />
-        ) : (
+        {/* Gradient placeholder（仅在无 previewSrc 且未播放时显示）*/}
+        {!previewSrc && (
           <div
             style={{
               position: "absolute",
@@ -145,9 +132,46 @@ export default function DemoVideoFrame({
           />
         )}
 
-        {/* Dark overlay when paused */}
+        {/* Dark overlay when paused — image sits inside with side padding & rounded corners */}
         {!playing && (
-          <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.36)" }} />
+          <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.36)" }}>
+            {previewSrc && (
+              <img
+                src={previewSrc}
+                alt=""
+                style={{
+                  position: "absolute",
+                  top: "3%",
+                  bottom: "3%",
+                  left: "3%",
+                  right: "3%",
+                  width: "94%",
+                  height: "94%",
+                  objectFit: "cover",
+                  objectPosition: "center",
+                  borderRadius: "8px",
+                }}
+              />
+            )}
+          </div>
+        )}
+
+        {/* ── 顶部橙色渐变蒙版（与图片同圆角同间距）── */}
+        {!playing && previewSrc && (
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              bottom: 0,
+              left: "3%",
+              right: "3%",
+              height: "50%",
+              borderRadius: "8px",
+              background:
+                "linear-gradient(to bottom, rgba(246,83,16,0.22) 0%, rgba(246,83,16,0.07) 50%, transparent 100%)",
+              pointerEvents: "none",
+            }}
+          />
         )}
 
         {/* ── Play button + label ── */}
