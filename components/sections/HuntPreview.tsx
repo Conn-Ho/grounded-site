@@ -26,7 +26,7 @@ export default function HuntPreview({
       id="hunt"
       className="snap-section relative flex flex-col justify-center py-24 md:py-28"
     >
-      <div className="mx-auto w-full max-w-[1400px] px-6 md:px-10 lg:px-16">
+      <div className="container-wide">
         {!isPage && (
           <div className="mb-10 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
             <SectionHeading

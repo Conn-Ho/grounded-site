@@ -20,7 +20,7 @@ export default function AllProjects({
 
   return (
     <section className="relative py-24 md:py-28">
-      <div className="mx-auto w-full max-w-[1400px] px-6 md:px-10 lg:px-16">
+      <div className="container-wide">
 
         {/* 标题 */}
         <div className="mb-10">

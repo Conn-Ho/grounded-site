@@ -49,11 +49,11 @@ export default function Packages({ dict }: { dict: Dict["packages"] }) {
   return (
     <section
       id="packages"
-      className="snap-section relative flex flex-col justify-center py-24 md:py-28"
+      className="snap-section relative flex flex-col justify-center py-28 md:py-36"
     >
-      <div className="mx-auto w-full max-w-[1400px] px-6 md:px-10 lg:px-16">
+      <div className="container-wide">
 
-        <div className="grid items-center gap-12 lg:grid-cols-[1.15fr_1fr] lg:gap-20">
+        <div className="grid items-center gap-12 lg:grid-cols-[1.3fr_1fr] lg:gap-16 xl:gap-24 min-[1920px]:gap-32">
 
           {/* ── Left: macOS showcase frame ── */}
           <div
@@ -71,7 +71,7 @@ export default function Packages({ dict }: { dict: Dict["packages"] }) {
             <div
               style={{
                 position: "relative",
-                aspectRatio: "16/10",
+                aspectRatio: "16/9",
                 overflow: "hidden",
                 background: "linear-gradient(135deg, #0f0d0b 0%, #1a1208 50%, #0a0908 100%)",
               }}
@@ -106,7 +106,7 @@ export default function Packages({ dict }: { dict: Dict["packages"] }) {
           {/* ── Right: numbered carousel list ── */}
           <div>
             {/* Eyebrow + title */}
-            <div className="mb-10">
+            <div className="mb-12 md:mb-16">
               <div className="mono mb-4 flex items-center gap-3 text-[11px] uppercase tracking-[0.25em] text-[color:var(--accent)]">
                 <span className="h-px w-8 bg-[color:var(--accent-line)]" />
                 {dict.eyebrow}
@@ -129,15 +129,15 @@ export default function Packages({ dict }: { dict: Dict["packages"] }) {
               {items.map((item, idx) => {
                 const isActive = idx === active;
                 return (
-                  <button
-                    key={item.name}
+                    <button
                     onClick={() => goTo(idx)}
                     className="group relative w-full text-left"
                     style={{
                       borderTop:
                         idx === 0 ? "1px solid rgba(255,255,255,0.08)" : undefined,
                       borderBottom: "1px solid rgba(255,255,255,0.08)",
-                      padding: "20px 0",
+                      padding: "24px 0",
+                      minHeight: "72px",
                       background: "none",
                       cursor: "pointer",
                     }}

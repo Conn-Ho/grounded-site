@@ -57,11 +57,11 @@ export default function GalleryHunt({
   }
 
   return (
-    <section id="gallery" className="snap-section relative flex flex-col justify-center py-24 md:py-28">
+    <section id="gallery" className="snap-section relative flex flex-col justify-center py-28 md:py-36">
       <div className="container-wide">
 
         {/* ── 头部 ── */}
-        <div className="mb-10 flex items-end justify-between gap-8">
+        <div className="mb-12 md:mb-16 flex items-end justify-between gap-8">
           <div className="max-w-3xl">
             <div className="mb-4 flex items-center gap-3 text-[11px] uppercase tracking-[0.25em] text-[color:var(--accent)]">
               <span className="h-px w-8 bg-[color:var(--accent-line)]" />
@@ -111,7 +111,7 @@ export default function GalleryHunt({
           <div
             ref={scrollRef}
             onWheel={handleWheel}
-            className="flex gap-5 overflow-x-auto snap-x snap-mandatory"
+            className="flex gap-6 overflow-x-auto snap-x snap-mandatory"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
             {/* ── 前段：Gallery 图文卡 ── */}
@@ -119,11 +119,11 @@ export default function GalleryHunt({
               <article
                 key={p.slug}
                 className="group snap-start flex-shrink-0 overflow-hidden border border-[color:var(--card-border)] bg-[color:var(--card-bg)] transition-colors hover:border-[color:var(--accent-line)]"
-                style={{ width: "calc((100% - 2 * 1.25rem) / 3)" }}
+                style={{ width: "calc((100% - 2 * 1.5rem) / 3)", minWidth: "360px" }}
               >
                 {/* 封面 — 点阵纹理 */}
                 <div
-                  className={`relative aspect-[4/3] overflow-hidden bg-gradient-to-br ${covers[idx % covers.length]}`}
+                  className={`relative aspect-[16/10] min-[1920px]:aspect-[2/1] overflow-hidden bg-gradient-to-br ${covers[idx % covers.length]}`}
                 >
                   <svg className="absolute inset-0 h-full w-full opacity-40" aria-hidden>
                     <defs>
@@ -177,7 +177,7 @@ export default function GalleryHunt({
                 <article
                   key={item.id}
                   className="group snap-start flex-shrink-0 overflow-hidden border border-[color:var(--card-border)] bg-[color:var(--card-bg)] transition-colors hover:border-[color:var(--accent-line)]"
-                  style={{ width: "calc((100% - 2 * 1.25rem) / 3)" }}
+                  style={{ width: "calc((100% - 2 * 1.5rem) / 3)", minWidth: "360px" }}
                 >
                   <div className={`relative aspect-[4/3] overflow-hidden bg-gradient-to-br ${cover}`}>
                     <svg className="absolute inset-0 h-full w-full opacity-40" aria-hidden>
