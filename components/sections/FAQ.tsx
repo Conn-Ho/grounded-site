@@ -3,7 +3,7 @@ import SectionHeading from "../SectionHeading";
 
 export default function FAQ({ dict }: { dict: Dict["faq"] }) {
   return (
-    <section id="faq" className="snap-section relative flex flex-col justify-center py-24 md:py-28">
+    <section id="faq" className="snap-section relative flex flex-col justify-center py-28 md:py-36">
       <div className="container-wide">
         <SectionHeading eyebrow={dict.eyebrow} title={dict.title} />
 
@@ -28,7 +28,7 @@ export default function FAQ({ dict }: { dict: Dict["faq"] }) {
                   </svg>
                 </span>
               </summary>
-              <p className="px-4 -mx-4 pb-6 mt-2 max-w-3xl text-[14px] leading-relaxed text-[color:var(--foreground-dim)]">
+              <p className="px-4 -mx-4 pb-6 mt-2 text-[14px] leading-relaxed text-[color:var(--foreground-dim)]" style={{ maxWidth: "65ch" }}>
                 {it.a}
               </p>
             </details>

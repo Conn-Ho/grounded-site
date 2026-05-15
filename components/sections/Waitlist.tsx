@@ -7,8 +7,8 @@ export default function Waitlist({
   locale: Locale;
 }) {
   return (
-    <section id="waitlist" className="snap-section relative flex flex-col justify-center py-24 md:py-28">
-      <div className="mx-auto max-w-[900px] px-6 md:px-10 lg:px-16 2xl:max-w-[1000px] text-center">
+    <section id="waitlist" className="snap-section relative flex flex-col justify-center py-28 md:py-36">
+      <div className="container-wide text-center">
         <div className="mono mb-5 inline-flex items-center gap-3 text-[11px] uppercase tracking-[0.25em] text-[color:var(--accent)]">
           <span className="pulse-dot inline-block h-1.5 w-1.5 rounded-full bg-[color:var(--accent)]" />
           {dict.eyebrow}
@@ -18,7 +18,7 @@ export default function Waitlist({
           <br />
           <span className="text-[color:var(--accent)]">{dict.titleLine2}</span>
         </h2>
-        <p className="mx-auto mt-6 max-w-3xl text-[16px] leading-[1.75] text-[color:var(--foreground-dim)]">
+        <p className="mx-auto mt-6 text-[16px] leading-[1.75] text-[color:var(--foreground-dim)]" style={{ maxWidth: "680px" }}>
           {dict.desc.split("\n").map((line, i, arr) => (
             <span key={i}>
               {line}
@@ -27,7 +27,7 @@ export default function Waitlist({
           ))}
         </p>
 
-        <div className="mt-10 mx-auto max-w-3xl">
+        <div className="mt-10 mx-auto" style={{ maxWidth: "680px" }}>
           <a
             href="https://tally.so"
             target="_blank"

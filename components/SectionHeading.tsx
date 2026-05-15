@@ -10,12 +10,12 @@ export default function SectionHeading({
   centered?: boolean;
 }) {
   return (
-    <div className={`mb-14 ${centered ? "mx-auto max-w-4xl text-center" : "max-w-2xl"}`}>
+    <div className={`mb-16 md:mb-20 ${centered ? "mx-auto max-w-4xl text-center" : ""}`}>
       <div className={`mono mb-4 flex items-center gap-3 text-[11px] uppercase tracking-[0.25em] text-[color:var(--accent)] ${centered ? "justify-center" : ""}`}>
         <span className="h-px w-8 bg-[color:var(--accent-line)]" />
         {eyebrow}
       </div>
-      <h2 className="display-font text-[clamp(2rem,4.5vw,3.6rem)] leading-[1.02]">
+      <h2 className="display-font text-[clamp(2rem,4.5vw,4.5rem)] leading-[1.02]">
         {title.split("\n").map((line, i, arr) => (
           <span key={i}>
             {line}

@@ -24,7 +24,7 @@ const icons = [
 
 export default function Loop({ dict }: { dict: Dict["loop"] }) {
   return (
-    <section id="loop" className="snap-section relative flex flex-col justify-center py-24 md:py-28">
+    <section id="loop" className="snap-section relative flex flex-col justify-center py-28 md:py-36">
       <div className="container-wide">
 
         <SectionHeading
@@ -34,7 +34,7 @@ export default function Loop({ dict }: { dict: Dict["loop"] }) {
           centered
         />
 
-        <div className="grid gap-5 md:grid-cols-3">
+        <div className="mt-16 min-[1920px]:mt-24 grid gap-6 md:gap-8 md:grid-cols-3">
           {dict.items.map((l, idx) => (
             <article
               key={l.n}
@@ -42,10 +42,10 @@ export default function Loop({ dict }: { dict: Dict["loop"] }) {
               style={{ background: "#1e1a16" }}
             >
 
-              <div className="flex flex-1 flex-col p-8">
+              <div className="flex flex-1 flex-col p-8 md:p-10 min-[1920px]:p-14">
                 {/* 标题 + 编号 */}
                 <div className="mb-4 flex items-start justify-between gap-4">
-                  <h3 className="display-font text-[20px] tracking-wide leading-tight">
+                  <h3 className="display-font text-[20px] min-[1920px]:text-[24px] tracking-wide leading-tight">
                     {l.title}
                   </h3>
                   <span className="mono shrink-0 text-[11px] tracking-widest text-[color:var(--accent)] opacity-60">
@@ -54,12 +54,12 @@ export default function Loop({ dict }: { dict: Dict["loop"] }) {
                 </div>
 
                 {/* 描述 */}
-                <p className="flex-1 text-[14px] leading-[1.75] text-[color:var(--foreground-dim)]">
+                <p className="flex-1 text-[14px] min-[1920px]:text-[16px] leading-[1.75] text-[color:var(--foreground-dim)]">
                   {l.body}
                 </p>
 
                 {/* 底部：图标 + 标签 */}
-                <div className="mt-8 flex items-end justify-between gap-4">
+                <div className="mt-10 flex items-end justify-between gap-4">
                   {/* 图标 */}
                   <span className="text-[color:var(--accent)] opacity-70">
                     {icons[idx % icons.length]}

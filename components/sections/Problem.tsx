@@ -67,7 +67,7 @@ export default function Problem({ dict }: { dict: Dict["problem"] }) {
   return (
     <section
       id="problem"
-      className="snap-section relative flex flex-col justify-center py-24 md:py-28"
+      className="snap-section relative flex flex-col justify-center py-28 md:py-36"
     >
       <div className="container-wide">
         <SectionHeading
@@ -77,15 +77,15 @@ export default function Problem({ dict }: { dict: Dict["problem"] }) {
           centered
         />
 
-        <div className="mt-12 grid gap-px overflow-hidden rounded-sm border border-[color:var(--card-border)] bg-[color:var(--card-border)] md:grid-cols-2">
+        <div className="mt-16 min-[1920px]:mt-24 grid gap-px overflow-hidden rounded-sm border border-[color:var(--card-border)] bg-[color:var(--card-border)] md:grid-cols-2">
 
           {/* ── 左列：现在 ── */}
-          <div className="px-10 py-12 md:px-14 md:py-14" style={{ background: "#100e0c" }}>
+          <div className="px-8 py-14 md:px-16 md:py-20 min-[1920px]:px-24 min-[1920px]:py-28" style={{ background: "#100e0c" }}>
 
             {/* 列头 */}
             <div className="mono mb-2 flex items-center gap-3">
               <span className="inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-[color:var(--muted)]" />
-              <span className="text-[16px] font-bold uppercase tracking-[0.1em] text-[color:var(--foreground-dim)]">
+              <span className="text-[16px] min-[1920px]:text-[20px] font-bold uppercase tracking-[0.1em] text-[color:var(--foreground-dim)]">
                 {dict.today.label}
               </span>
             </div>
@@ -104,7 +104,7 @@ export default function Problem({ dict }: { dict: Dict["problem"] }) {
 
           {/* ── 右列：接入 Amagine ── */}
           <div
-            className="relative overflow-hidden px-10 py-12 md:px-14 md:py-14"
+            className="relative overflow-hidden px-8 py-14 md:px-16 md:py-20 min-[1920px]:px-24 min-[1920px]:py-28"
             style={{ background: "#100e0c" }}
           >
             {/* 顶部橙色光晕 */}
@@ -115,7 +115,7 @@ export default function Problem({ dict }: { dict: Dict["problem"] }) {
             {/* 列头 */}
             <div className="mono mb-2 flex items-center gap-3 text-[color:var(--accent)]">
               <span className="pulse-dot inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-[color:var(--accent)]" />
-              <span className="text-[16px] font-bold uppercase tracking-[0.1em]">
+              <span className="text-[16px] min-[1920px]:text-[20px] font-bold uppercase tracking-[0.1em]">
                 {dict.closed.label}
               </span>
             </div>
