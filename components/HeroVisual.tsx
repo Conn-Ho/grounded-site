@@ -2,7 +2,7 @@
 
 import { useRef, useMemo, useState, useEffect, useCallback } from "react";
 import { Canvas, useFrame, ThreeEvent } from "@react-three/fiber";
-import { Html, OrbitControls } from "@react-three/drei";
+import { Html } from "@react-three/drei";
 import * as THREE from "three";
 
 /* ───────────────────────────────────────────────
@@ -674,64 +674,6 @@ function Beacon({
    ─────────────────────────────────────────────── */
 function Scene({ theme }: { theme: ThemeColors }) {
   const groupRef = useRef<THREE.Group>(null);
-  const [hoveredId, setHoveredId] = useState(-1);
-
-  // 模型爆炸展开——粒子消失后触发（由 elapsedTime 驱动）
-  const modelGroupRef = useRef<THREE.Group>(null);
-
-  useFrame((state) => {
-    const mg = modelGroupRef.current;
-    if (!mg) return;
-    const t = state.clock.elapsedTime;
-
-    const START = 1.9;
-    const DURATION = 0.7;
-    if (t < START) {
-      mg.scale.setScalar(0.001);
-      return;
-    }
-    const raw = Math.min(1, (t - START) / DURATION);
-    const eased = raw * raw * (3 - 2 * raw); // smoothstep
-    mg.scale.setScalar(0.001 + (1 - 0.001) * eased);
-  });
-
-  // 平台数据
-  const platforms = [
-    { y: -0.6, label: "MCP", opacity: 0.4 },
-    { y: -0.3, label: "", opacity: 0.6 },
-    { y: 0, label: "Agents", opacity: 0.85 },
-  ];
-
-  // 方块数据
-  const boxes: BoxData[] = [
-    { id: 0, gx: -0.6, gz: -0.3, label: "US-West", labelSub: "latency 12ms" },
-    { id: 1, gx: 0.3, gz: -0.6, label: "EU-Central", labelSub: "latency 24ms" },
-    { id: 2, gx: 0.0, gz: 0.15, isCore: true, label: "⚡ 127ms", labelSub: "startup" },
-    { id: 3, gx: -0.15, gz: 0.65 },
-    { id: 4, gx: 0.65, gz: 0.35 },
-  ];
-
-  // 外部节点
-  const nodes = [
-    { pos: [-2.2, -0.8, 0.4] as [number, number, number], label: "US-WEST", phase: 0 },
-    { pos: [-1.5, -0.8, 2.2] as [number, number, number], label: "EU", phase: 1.5 },
-    { pos: [2.0, -0.8, -0.9] as [number, number, number], label: "ASIA", phase: 3.0 },
-  ];
-
-  // 连接线
-  const connections = [
-    { from: [-1.5, 0, 0] as [number, number, number], to: nodes[0].pos, phase: 0 },
-    { from: [-0.8, 0, 1.5] as [number, number, number], to: nodes[1].pos, phase: 1.5 },
-    { from: [1.5, 0, -0.5] as [number, number, number], to: nodes[2].pos, phase: 3.0 },
-  ];
-
-  // Beacon 位置（平台四角 + 方块上方）
-  const beacons = [
-    { pos: [-1.5, 0.05, -1.5] as [number, number, number], phase: 0 },
-    { pos: [1.5, 0.05, -1.5] as [number, number, number], phase: 1.3 },
-    { pos: [-1.5, 0.05, 1.5] as [number, number, number], phase: 2.5 },
-    { pos: [1.5, 0.05, 1.5] as [number, number, number], phase: 0.7 },
-  ];
 
   return (
     <group ref={groupRef}>
@@ -739,63 +681,10 @@ function Scene({ theme }: { theme: ThemeColors }) {
       <ambientLight intensity={1.5} />
       <directionalLight position={[8, 12, 8]} intensity={1.5} />
       <pointLight position={[0, 4, 0]} intensity={0.8} color={theme.accent} distance={12} />
-      <pointLight position={[-4, 2, -4]} intensity={0.6} color="#ffffff" distance={10} />
 
       {/* 开场粒子凝聚动画 */}
       <ParticleIntro />
-
-      {/* 轨道控制 */}
-      <OrbitControls
-        enableDamping
-        dampingFactor={0.15}
-        minDistance={3}
-        maxDistance={16}
-        minPolarAngle={0.1}
-        maxPolarAngle={Math.PI / 2.1}
-        target={[0, 0, 0]}
-      />
-
-      {/* 平台堆叠 */}
-      <group ref={modelGroupRef}>
-      {platforms.map((p, i) => (
-        <Platform
-          key={i}
-          width={3.2 - i * 0.15}
-          depth={3.2 - i * 0.15}
-          height={0.12}
-          position={[0, p.y, 0]}
-          label={p.label}
-          theme={theme}
-        />
-      ))}
-
-      {/* 顶部方块 */}
-      {boxes.map((box) => (
-        <AnimatedBox
-          key={box.id}
-          data={box}
-          baseY={0.4}
-          theme={theme}
-          hoveredId={hoveredId}
-          setHoveredId={setHoveredId}
-        />
-      ))}
-
-      {/* 外部节点 */}
-      {nodes.map((n, i) => (
-        <RegionNode key={i} position={n.pos} label={n.label} theme={theme} phase={n.phase} />
-      ))}
-
-      {/* 连接线 */}
-      {connections.map((c, i) => (
-        <Connection key={i} from={c.from} to={c.to} theme={theme} phase={c.phase} />
-      ))}
-
-      {/* 环境脉冲 */}
-      {beacons.map((b, i) => (
-        <Beacon key={i} position={b.pos} theme={theme} phase={b.phase} />
-      ))}
-      </group>
+      <CenterGlow accentColor={theme.accent} />
     </group>
   );
 }

@@ -1,8 +1,4 @@
 import type { Dict } from "@/lib/i18n";
-import ParticleField from "./ParticleField";
-import HeroVisual from "./HeroVisual";
-import CircuitTraces from "./CircuitTraces";
-import MeteorScroll from "./MeteorScroll";
 import DemoVideoFrame from "./DemoVideoFrame";
 
 export default function Hero({ dict }: { dict: Dict["hero"] }) {
@@ -15,15 +11,8 @@ export default function Hero({ dict }: { dict: Dict["hero"] }) {
 
   return (
     <section className="snap-section relative flex items-center overflow-hidden pt-16 pb-12 md:pt-20 md:pb-16">
-      <ParticleField />
-
-      {/* 响应式画框 — Canvas 全幅背景 + 文字浮动左上 */}
+      {/* 响应式画框 — 文字浮动左上 */}
       <div className="relative z-10 container-wide hero-frame">
-        {/* Canvas 全幅背景 */}
-        <div className="absolute inset-0">
-          <HeroVisual />
-        </div>
-
         {/* 文字区域浮动在左侧，垂直居中 */}
         <div className="absolute top-0 bottom-0 left-0 flex flex-col justify-center max-w-[480px] min-[1920px]:max-w-[600px] p-6 md:p-10 lg:p-12 min-[1920px]:p-16">
           <div className="relative z-20">
@@ -71,7 +60,7 @@ export default function Hero({ dict }: { dict: Dict["hero"] }) {
                 return (
                   <span key={i}>
                     {lines.map((line, j) => (
-                      <span key={j}>
+                      <span key={j} className="whitespace-nowrap">
                         {j > 0 && <br />}
                         {line}
                       </span>
@@ -124,13 +113,6 @@ export default function Hero({ dict }: { dict: Dict["hero"] }) {
         </div>
       </div>
 
-      {/* 滚动指示器 */}
-      <div className="pointer-events-none absolute bottom-6 left-1/2 z-10 -translate-x-1/2">
-        <div className="mono flex flex-col items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-[color:var(--muted)]">
-          <span>{dict.scroll}</span>
-          <MeteorScroll />
-        </div>
-      </div>
     </section>
   );
 }

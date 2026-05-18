@@ -20,7 +20,7 @@ export default function Waitlist({
         </h2>
         <p className="mx-auto mt-6 text-[16px] leading-[1.75] text-[color:var(--foreground-dim)]" style={{ maxWidth: "680px" }}>
           {dict.desc.split("\n").map((line, i, arr) => (
-            <span key={i}>
+            <span key={i} className="whitespace-nowrap">
               {line}
               {i < arr.length - 1 && <br />}
             </span>

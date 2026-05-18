@@ -17,7 +17,7 @@ export default function SectionHeading({
       </div>
       <h2 className="display-font text-[clamp(2rem,4.5vw,4.5rem)] leading-[1.02]">
         {title.split("\n").map((line, i, arr) => (
-          <span key={i}>
+          <span key={i} className="whitespace-nowrap">
             {line}
             {i < arr.length - 1 && <br />}
           </span>
